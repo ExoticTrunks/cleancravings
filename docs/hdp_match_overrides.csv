@@ -1,0 +1,2 @@
+outlet_id,outlet_name,sfa_licence_number,decision,reason
+3106,Ah Kun Prawn Noodle,CI601119002,reject,"Different stall: Ah Kun vs Ya Kun. Distinctive-name score is exactly 0.80, so the check alone doesn't drop it"

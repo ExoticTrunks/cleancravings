@@ -1,0 +1,160 @@
+@startuml CleanCravings_DesignClassDiagram_ETL
+' SC2006 SCSL Group 4. Design class diagram for data ingestion (backend/etl).
+' Each source is an independent module (NFR-10), run outside the request path.
+!pragma layout smetana
+title CleanCravings - Design Class Diagram (data ingestion)
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+hide empty members
+
+package "Scheduling" #EAEDED {
+  class RunAll <<control>> {
+    etl/run_all.py, GitHub Actions cron 02:00 SGT
+    --
+    + main(): int
+  }
+  class LoadSample <<control>> {
+    etl/load_sample.py, offline demo data
+    --
+    + main()
+  }
+  class "ClosureController.generate_alerts" as ClosureAlertGen <<control>>
+}
+
+package "Sync controllers (one per source)" #D5F5E3 {
+  class NEASyncController <<control>> {
+    etl/nea_sync.py
+    --
+    + parse_row(row): (centre, closures)
+    + parse_date(s): Date [0..1]
+    + load(db, rows): int
+    + main()
+  }
+  class SFASyncController <<control>> {
+    etl/sfa_import.py
+    --
+    + read_rows(path): List<row>
+    + unescape(value): String
+    + parse_grade(raw): (SafeGradeValue, Boolean) [0..1]
+    + load(db, rows, snapshot, suspended): int
+    + main(argv)
+  }
+  class HPBSyncController <<control>> {
+    etl/hpb_partners_sync.py
+    --
+    + FUZZY_MIN = 0.90
+    + FUZZY_MARGIN = 0.10
+    + DISTINCT_MIN = 0.80
+    + parse_row(row): outlet [0..1]
+    + drop_duplicates(rows): List<row>
+    + normalise(name): String
+    + fuzzy_accepts(outlet, sfa, score, runner_up): Boolean
+    + match_outlets(outlets, centre_by_postal, stalls, overrides): List<Match>
+    + read_overrides(outlets, path): Map
+    + load(db, outlets, overrides): Counter
+    + review(path)
+    + main(argv)
+  }
+  class ReferenceDataLoader <<control>> {
+    etl/seed_reference.py
+    --
+    + read_rules(path): List<rule>
+    + read_dishes(path): List<dish>
+    + load(db): int
+  }
+}
+
+package "Shared helpers: etl/common, app/geo, app/db" #FDEBD0 {
+  class SyncRunLogger <<control>> {
+    + sync_run(source, is_sample): (db, run)
+    --
+    on failure: roll back and keep
+    the last good data (NFR-9)
+  }
+  class DataGovClient <<control>> {
+    + fetch_all_rows(resource_id): List<row>
+    + fetch_geojson(dataset_id): Map
+  }
+  class CentreLookup <<control>> {
+    + centres_by_postal(db): Map<postal, HawkerCentre>
+    + postal_codes(address): List<String>
+    + unit_number(address): String [0..1]
+  }
+  class Database <<control>> {
+    + init_db(bind)
+    + rls_statements(dialect): List<String>
+    --
+    on Postgres: RLS on every table
+  }
+}
+
+package "Entity (details in the entity class diagram)" #D6EAF8 {
+  class HawkerCentre <<entity>>
+  class ClosurePeriod <<entity>>
+  class Licensee <<entity>>
+  class Stall <<entity>>
+  class SAFEGrade <<entity>>
+  class ParticipatingStall <<entity>>
+  class DishType <<entity>>
+  class ClassificationRule <<entity>>
+  class ClosureAlert <<entity>>
+  class SyncRun <<entity>>
+}
+
+package "External data sources" #FFFFFF {
+  class "data.gov.sg\nDates of Hawker Centres Closure" as NEAData <<external>>
+  class "SFA Track Records\nExcel export (etl/inbox)" as SFAData <<external>>
+  class "data.gov.sg\nHealthier Dining Partners" as HPBData <<external>>
+  class "Team CSVs\netl/data/*.csv" as RefData <<external>>
+  class "docs/hdp_match_overrides.csv" as Overrides <<external>>
+}
+
+RunAll ..> ReferenceDataLoader : 1. REF
+RunAll ..> NEASyncController : 2. NEA
+RunAll ..> SFASyncController : 3. SFA (if export in inbox)
+RunAll ..> HPBSyncController : 4. HPB (after SFA)
+RunAll ..> ClosureAlertGen : 5. alerts
+ClosureAlertGen ..> ClosureAlert
+
+LoadSample ..> ReferenceDataLoader
+LoadSample ..> NEASyncController
+LoadSample ..> SFASyncController
+LoadSample ..> HPBSyncController
+
+NEASyncController ..> DataGovClient
+HPBSyncController ..> DataGovClient
+DataGovClient ..> NEAData
+DataGovClient ..> HPBData
+SFASyncController ..> SFAData
+ReferenceDataLoader ..> RefData
+HPBSyncController ..> Overrides
+
+NEASyncController ..> SyncRunLogger
+SFASyncController ..> SyncRunLogger
+HPBSyncController ..> SyncRunLogger
+ReferenceDataLoader ..> SyncRunLogger
+SyncRunLogger ..> Database
+SyncRunLogger ..> SyncRun
+SFASyncController ..> CentreLookup
+HPBSyncController ..> CentreLookup
+NEASyncController ..> CentreLookup
+
+NEASyncController ..> HawkerCentre
+NEASyncController ..> ClosurePeriod
+SFASyncController ..> Licensee
+SFASyncController ..> Stall
+SFASyncController ..> SAFEGrade
+HPBSyncController ..> ParticipatingStall
+HPBSyncController ..> Stall : sets halal
+ReferenceDataLoader ..> DishType
+ReferenceDataLoader ..> ClassificationRule
+
+note right of HPBSyncController
+  Matching order: manual overrides, then exact
+  normalised name, then guarded fuzzy match,
+  otherwise centre-level (stall_id null).
+  --review writes docs/hdp_match_review.csv
+  without touching the database.
+end note
+@enduml

@@ -1,0 +1,3202 @@
+{
+ "openapi": "3.1.0",
+ "info": {
+  "title": "CleanCravings API",
+  "description": "SC2006 SCSL Group 4. Serves NEA, SFA and HPB data through our own API (NFR-5).",
+  "version": "0.2.0"
+ },
+ "paths": {
+  "/api/meta/freshness": {
+   "get": {
+    "tags": [
+     "public"
+    ],
+    "summary": "Freshness",
+    "description": "'Last updated' per source (NFR-2) and staleness flag (NFR-9).",
+    "operationId": "freshness_api_meta_freshness_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/FreshnessOut"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/regions": {
+   "get": {
+    "tags": [
+     "public"
+    ],
+    "summary": "Regions",
+    "operationId": "regions_api_regions_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "type": "string"
+         },
+         "type": "array",
+         "title": "Response Regions Api Regions Get"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/centres": {
+   "get": {
+    "tags": [
+     "public"
+    ],
+    "summary": "List Centres",
+    "operationId": "list_centres_api_centres_get",
+    "parameters": [
+     {
+      "name": "q",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Q"
+      }
+     },
+     {
+      "name": "region",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Region"
+      }
+     },
+     {
+      "name": "min_grade",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "$ref": "#/components/schemas/SafeGradeValue"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Min Grade"
+      }
+     },
+     {
+      "name": "lat",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "number"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Lat"
+      }
+     },
+     {
+      "name": "lng",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "number"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Lng"
+      }
+     },
+     {
+      "name": "radius_km",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "number",
+         "exclusiveMinimum": 0
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Radius Km"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/CentreSummary"
+         },
+         "title": "Response List Centres Api Centres Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/centres/{centre_id}": {
+   "get": {
+    "tags": [
+     "public"
+    ],
+    "summary": "Centre Detail",
+    "operationId": "centre_detail_api_centres__centre_id__get",
+    "parameters": [
+     {
+      "name": "centre_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "title": "Centre Id"
+      }
+     },
+     {
+      "name": "min_grade",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "$ref": "#/components/schemas/SafeGradeValue"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Min Grade"
+      }
+     },
+     {
+      "name": "halal_only",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "boolean"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "description": "Omit to follow the signed-in user's HALAL restriction",
+       "title": "Halal Only"
+      },
+      "description": "Omit to follow the signed-in user's HALAL restriction"
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/CentreDetail"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/stalls/{stall_id}": {
+   "get": {
+    "tags": [
+     "public"
+    ],
+    "summary": "Stall Detail",
+    "operationId": "stall_detail_api_stalls__stall_id__get",
+    "parameters": [
+     {
+      "name": "stall_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "title": "Stall Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/StallDetail"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/search": {
+   "get": {
+    "tags": [
+     "public"
+    ],
+    "summary": "Search",
+    "operationId": "search_api_search_get",
+    "parameters": [
+     {
+      "name": "q",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 2,
+       "title": "Q"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/SearchOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/hdp-note": {
+   "get": {
+    "tags": [
+     "public"
+    ],
+    "summary": "Hdp Note",
+    "operationId": "hdp_note_api_hdp_note_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "string",
+         "title": "Response Hdp Note Api Hdp Note Get"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/dishes": {
+   "get": {
+    "tags": [
+     "public"
+    ],
+    "summary": "Dishes",
+    "description": "UC-6.0. Logged-in users get their saved profile unless the query overrides it.",
+    "operationId": "dishes_api_dishes_get",
+    "parameters": [
+     {
+      "name": "conditions",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "array",
+       "items": {
+        "enum": [
+         "HYPERTENSION",
+         "DIABETES",
+         "HIGH_CHOLESTEROL"
+        ],
+        "type": "string"
+       },
+       "default": [],
+       "title": "Conditions"
+      }
+     },
+     {
+      "name": "restrictions",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "array",
+       "items": {
+        "enum": [
+         "NO_PORK",
+         "NO_BEEF",
+         "VEGETARIAN",
+         "HALAL"
+        ],
+        "type": "string"
+       },
+       "default": [],
+       "title": "Restrictions"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/DishListOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/rules": {
+   "get": {
+    "tags": [
+     "public"
+    ],
+    "summary": "Rules",
+    "operationId": "rules_api_rules_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "items": {
+          "$ref": "#/components/schemas/RuleOut"
+         },
+         "type": "array",
+         "title": "Response Rules Api Rules Get"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/recommendations": {
+   "get": {
+    "tags": [
+     "public"
+    ],
+    "summary": "Recommendations",
+    "operationId": "recommendations_api_recommendations_get",
+    "parameters": [
+     {
+      "name": "lat",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "number"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Lat"
+      }
+     },
+     {
+      "name": "lng",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "number"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Lng"
+      }
+     },
+     {
+      "name": "limit",
+      "in": "query",
+      "required": false,
+      "schema": {
+       "type": "integer",
+       "maximum": 50,
+       "minimum": 1,
+       "default": 20,
+       "title": "Limit"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RecommendationOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/geocode": {
+   "get": {
+    "tags": [
+     "public"
+    ],
+    "summary": "Geocode",
+    "description": "UC-2.0 AC.1: manual location. Proxied so the client only ever talks to our API (NFR-5).",
+    "operationId": "geocode_api_geocode_get",
+    "parameters": [
+     {
+      "name": "q",
+      "in": "query",
+      "required": true,
+      "schema": {
+       "type": "string",
+       "minLength": 2,
+       "title": "Q"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/GeocodeResult"
+         },
+         "title": "Response Geocode Api Geocode Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/me": {
+   "get": {
+    "tags": [
+     "me"
+    ],
+    "summary": "Me",
+    "operationId": "me_api_me_get",
+    "parameters": [
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/MeOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/me/profile": {
+   "get": {
+    "tags": [
+     "me"
+    ],
+    "summary": "Get Profile",
+    "operationId": "get_profile_api_me_profile_get",
+    "parameters": [
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "anyOf": [
+          {
+           "$ref": "#/components/schemas/ProfileOut"
+          },
+          {
+           "type": "null"
+          }
+         ],
+         "title": "Response Get Profile Api Me Profile Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "put": {
+    "tags": [
+     "me"
+    ],
+    "summary": "Save Profile",
+    "operationId": "save_profile_api_me_profile_put",
+    "parameters": [
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ProfileIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ProfileOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/me/favourites": {
+   "get": {
+    "tags": [
+     "me"
+    ],
+    "summary": "Favourites",
+    "operationId": "favourites_api_me_favourites_get",
+    "parameters": [
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/FavouriteOut"
+         },
+         "title": "Response Favourites Api Me Favourites Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "me"
+    ],
+    "summary": "Add Favourite",
+    "operationId": "add_favourite_api_me_favourites_post",
+    "parameters": [
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/FavouriteIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/FavouriteOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/me/favourites/{fav_id}": {
+   "delete": {
+    "tags": [
+     "me"
+    ],
+    "summary": "Remove Favourite",
+    "operationId": "remove_favourite_api_me_favourites__fav_id__delete",
+    "parameters": [
+     {
+      "name": "fav_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "title": "Fav Id"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/me/visits": {
+   "get": {
+    "tags": [
+     "me"
+    ],
+    "summary": "Visits",
+    "operationId": "visits_api_me_visits_get",
+    "parameters": [
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/VisitOut"
+         },
+         "title": "Response Visits Api Me Visits Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   },
+   "post": {
+    "tags": [
+     "me"
+    ],
+    "summary": "Add Visit",
+    "operationId": "add_visit_api_me_visits_post",
+    "parameters": [
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "requestBody": {
+     "required": true,
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/VisitIn"
+       }
+      }
+     }
+    },
+    "responses": {
+     "201": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/VisitOut"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/me/alerts": {
+   "get": {
+    "tags": [
+     "me"
+    ],
+    "summary": "Alerts",
+    "operationId": "alerts_api_me_alerts_get",
+    "parameters": [
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "type": "array",
+         "items": {
+          "$ref": "#/components/schemas/AlertOut"
+         },
+         "title": "Response Alerts Api Me Alerts Get"
+        }
+       }
+      }
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/me/alerts/{alert_id}/read": {
+   "post": {
+    "tags": [
+     "me"
+    ],
+    "summary": "Read Alert",
+    "operationId": "read_alert_api_me_alerts__alert_id__read_post",
+    "parameters": [
+     {
+      "name": "alert_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "title": "Alert Id"
+      }
+     },
+     {
+      "name": "authorization",
+      "in": "header",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Authorization"
+      }
+     }
+    ],
+    "responses": {
+     "204": {
+      "description": "Successful Response"
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "/api/health": {
+   "get": {
+    "tags": [
+     "public"
+    ],
+    "summary": "Health",
+    "operationId": "health_api_health_get",
+    "responses": {
+     "200": {
+      "description": "Successful Response",
+      "content": {
+       "application/json": {
+        "schema": {
+         "additionalProperties": {
+          "type": "boolean"
+         },
+         "type": "object",
+         "title": "Response Health Api Health Get"
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ },
+ "components": {
+  "schemas": {
+   "AlertOut": {
+    "properties": {
+     "id": {
+      "type": "integer",
+      "title": "Id"
+     },
+     "message": {
+      "type": "string",
+      "title": "Message"
+     },
+     "sent_timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Sent Timestamp"
+     },
+     "read_status": {
+      "type": "boolean",
+      "title": "Read Status"
+     },
+     "centre_id": {
+      "type": "integer",
+      "title": "Centre Id"
+     },
+     "closure": {
+      "$ref": "#/components/schemas/ClosureOut"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "message",
+     "sent_timestamp",
+     "read_status",
+     "centre_id",
+     "closure"
+    ],
+    "title": "AlertOut"
+   },
+   "CentreDetail": {
+    "properties": {
+     "id": {
+      "type": "integer",
+      "title": "Id"
+     },
+     "centre_name": {
+      "type": "string",
+      "title": "Centre Name"
+     },
+     "street_address": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Street Address"
+     },
+     "postal_code": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Postal Code"
+     },
+     "region": {
+      "type": "string",
+      "title": "Region"
+     },
+     "latitude": {
+      "type": "number",
+      "title": "Latitude"
+     },
+     "longitude": {
+      "type": "number",
+      "title": "Longitude"
+     },
+     "number_of_stalls": {
+      "type": "integer",
+      "title": "Number Of Stalls"
+     },
+     "photo_url": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Photo Url"
+     },
+     "status": {
+      "$ref": "#/components/schemas/CentreStatus"
+     },
+     "distance_km": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Distance Km"
+     },
+     "hdp_count": {
+      "type": "integer",
+      "title": "Hdp Count",
+      "default": 0
+     },
+     "grades": {
+      "$ref": "#/components/schemas/GradeSummary"
+     },
+     "closures": {
+      "items": {
+       "$ref": "#/components/schemas/ClosureOut"
+      },
+      "type": "array",
+      "title": "Closures"
+     },
+     "stalls": {
+      "items": {
+       "$ref": "#/components/schemas/StallSummary"
+      },
+      "type": "array",
+      "title": "Stalls"
+     },
+     "stalls_hidden_by_threshold": {
+      "type": "integer",
+      "title": "Stalls Hidden By Threshold",
+      "default": 0
+     },
+     "halal_only": {
+      "type": "boolean",
+      "title": "Halal Only",
+      "default": false
+     },
+     "stalls_hidden_by_halal": {
+      "type": "integer",
+      "title": "Stalls Hidden By Halal",
+      "description": "Hidden because halal status is unknown or non-halal",
+      "default": 0
+     },
+     "hdp_outlets_without_stall_match": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Hdp Outlets Without Stall Match",
+      "default": []
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "centre_name",
+     "street_address",
+     "postal_code",
+     "region",
+     "latitude",
+     "longitude",
+     "number_of_stalls",
+     "photo_url",
+     "status",
+     "grades",
+     "closures",
+     "stalls"
+    ],
+    "title": "CentreDetail"
+   },
+   "CentreStatus": {
+    "properties": {
+     "state": {
+      "type": "string",
+      "enum": [
+       "open",
+       "closing_soon",
+       "closed",
+       "not_operating"
+      ],
+      "title": "State"
+     },
+     "active_closure": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/ClosureOut"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "next_closure": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/ClosureOut"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "days_to_next": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Days To Next"
+     },
+     "reopens_on": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reopens On"
+     }
+    },
+    "type": "object",
+    "required": [
+     "state"
+    ],
+    "title": "CentreStatus"
+   },
+   "CentreSummary": {
+    "properties": {
+     "id": {
+      "type": "integer",
+      "title": "Id"
+     },
+     "centre_name": {
+      "type": "string",
+      "title": "Centre Name"
+     },
+     "street_address": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Street Address"
+     },
+     "postal_code": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Postal Code"
+     },
+     "region": {
+      "type": "string",
+      "title": "Region"
+     },
+     "latitude": {
+      "type": "number",
+      "title": "Latitude"
+     },
+     "longitude": {
+      "type": "number",
+      "title": "Longitude"
+     },
+     "number_of_stalls": {
+      "type": "integer",
+      "title": "Number Of Stalls"
+     },
+     "photo_url": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Photo Url"
+     },
+     "status": {
+      "$ref": "#/components/schemas/CentreStatus"
+     },
+     "distance_km": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Distance Km"
+     },
+     "hdp_count": {
+      "type": "integer",
+      "title": "Hdp Count",
+      "default": 0
+     },
+     "grades": {
+      "$ref": "#/components/schemas/GradeSummary"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "centre_name",
+     "street_address",
+     "postal_code",
+     "region",
+     "latitude",
+     "longitude",
+     "number_of_stalls",
+     "photo_url",
+     "status",
+     "grades"
+    ],
+    "title": "CentreSummary"
+   },
+   "ClosureOut": {
+    "properties": {
+     "id": {
+      "type": "integer",
+      "title": "Id"
+     },
+     "start_date": {
+      "type": "string",
+      "format": "date",
+      "title": "Start Date"
+     },
+     "end_date": {
+      "type": "string",
+      "format": "date",
+      "title": "End Date"
+     },
+     "reason_type": {
+      "$ref": "#/components/schemas/ClosureReasonType"
+     },
+     "remarks": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Remarks"
+     },
+     "quarter": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Quarter"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "start_date",
+     "end_date",
+     "reason_type",
+     "remarks",
+     "quarter"
+    ],
+    "title": "ClosureOut"
+   },
+   "ClosureReasonType": {
+    "type": "string",
+    "enum": [
+     "SPRING_CLEANING",
+     "REPAIRS_AND_REDECORATION",
+     "OTHER_WORKS"
+    ],
+    "title": "ClosureReasonType"
+   },
+   "DishAssessment": {
+    "properties": {
+     "id": {
+      "type": "integer",
+      "title": "Id"
+     },
+     "dish_name": {
+      "type": "string",
+      "title": "Dish Name"
+     },
+     "category": {
+      "type": "string",
+      "title": "Category"
+     },
+     "serving_g": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Serving G"
+     },
+     "nutrients": {
+      "$ref": "#/components/schemas/Nutrients"
+     },
+     "verdict": {
+      "$ref": "#/components/schemas/Verdict"
+     },
+     "findings": {
+      "items": {
+       "$ref": "#/components/schemas/FindingOut"
+      },
+      "type": "array",
+      "title": "Findings"
+     },
+     "unchecked_conditions": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Unchecked Conditions"
+     },
+     "contains_pork": {
+      "type": "boolean",
+      "title": "Contains Pork"
+     },
+     "contains_beef": {
+      "type": "boolean",
+      "title": "Contains Beef"
+     },
+     "is_vegetarian": {
+      "type": "boolean",
+      "title": "Is Vegetarian"
+     },
+     "source": {
+      "type": "string",
+      "title": "Source"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "dish_name",
+     "category",
+     "serving_g",
+     "nutrients",
+     "verdict",
+     "findings",
+     "unchecked_conditions",
+     "contains_pork",
+     "contains_beef",
+     "is_vegetarian",
+     "source"
+    ],
+    "title": "DishAssessment"
+   },
+   "DishListOut": {
+    "properties": {
+     "conditions": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Conditions"
+     },
+     "restrictions": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Restrictions"
+     },
+     "dishes": {
+      "items": {
+       "$ref": "#/components/schemas/DishAssessment"
+      },
+      "type": "array",
+      "title": "Dishes"
+     },
+     "excluded_by_restriction": {
+      "type": "integer",
+      "title": "Excluded By Restriction"
+     },
+     "disclaimer": {
+      "type": "string",
+      "title": "Disclaimer"
+     }
+    },
+    "type": "object",
+    "required": [
+     "conditions",
+     "restrictions",
+     "dishes",
+     "excluded_by_restriction",
+     "disclaimer"
+    ],
+    "title": "DishListOut"
+   },
+   "FavouriteIn": {
+    "properties": {
+     "target_type": {
+      "$ref": "#/components/schemas/FavouriteTarget"
+     },
+     "target_id": {
+      "type": "integer",
+      "title": "Target Id"
+     }
+    },
+    "type": "object",
+    "required": [
+     "target_type",
+     "target_id"
+    ],
+    "title": "FavouriteIn"
+   },
+   "FavouriteOut": {
+    "properties": {
+     "id": {
+      "type": "integer",
+      "title": "Id"
+     },
+     "target_type": {
+      "$ref": "#/components/schemas/FavouriteTarget"
+     },
+     "target_id": {
+      "type": "integer",
+      "title": "Target Id"
+     },
+     "date_saved": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Date Saved"
+     },
+     "label": {
+      "type": "string",
+      "title": "Label"
+     },
+     "subtitle": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Subtitle"
+     },
+     "unavailable": {
+      "type": "boolean",
+      "title": "Unavailable",
+      "default": false
+     },
+     "centre_state": {
+      "anyOf": [
+       {
+        "type": "string",
+        "enum": [
+         "open",
+         "closing_soon",
+         "closed",
+         "not_operating"
+        ]
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Centre State"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "target_type",
+     "target_id",
+     "date_saved",
+     "label",
+     "subtitle"
+    ],
+    "title": "FavouriteOut"
+   },
+   "FavouriteTarget": {
+    "type": "string",
+    "enum": [
+     "CENTRE",
+     "STALL",
+     "DISH"
+    ],
+    "title": "FavouriteTarget"
+   },
+   "FindingOut": {
+    "properties": {
+     "rule_id": {
+      "type": "string",
+      "title": "Rule Id"
+     },
+     "condition": {
+      "type": "string",
+      "title": "Condition"
+     },
+     "nutrient": {
+      "type": "string",
+      "title": "Nutrient"
+     },
+     "message": {
+      "type": "string",
+      "title": "Message"
+     },
+     "verdict": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/Verdict"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "citation": {
+      "type": "string",
+      "title": "Citation"
+     }
+    },
+    "type": "object",
+    "required": [
+     "rule_id",
+     "condition",
+     "nutrient",
+     "message",
+     "verdict",
+     "citation"
+    ],
+    "title": "FindingOut"
+   },
+   "FreshnessOut": {
+    "properties": {
+     "sources": {
+      "items": {
+       "$ref": "#/components/schemas/SourceFreshness"
+      },
+      "type": "array",
+      "title": "Sources"
+     },
+     "any_sample": {
+      "type": "boolean",
+      "title": "Any Sample"
+     },
+     "today": {
+      "type": "string",
+      "format": "date",
+      "title": "Today"
+     }
+    },
+    "type": "object",
+    "required": [
+     "sources",
+     "any_sample",
+     "today"
+    ],
+    "title": "FreshnessOut"
+   },
+   "GeocodeResult": {
+    "properties": {
+     "label": {
+      "type": "string",
+      "title": "Label"
+     },
+     "latitude": {
+      "type": "number",
+      "title": "Latitude"
+     },
+     "longitude": {
+      "type": "number",
+      "title": "Longitude"
+     },
+     "postal_code": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Postal Code"
+     }
+    },
+    "type": "object",
+    "required": [
+     "label",
+     "latitude",
+     "longitude",
+     "postal_code"
+    ],
+    "title": "GeocodeResult"
+   },
+   "GradeSummary": {
+    "properties": {
+     "A": {
+      "type": "integer",
+      "title": "A",
+      "default": 0
+     },
+     "B": {
+      "type": "integer",
+      "title": "B",
+      "default": 0
+     },
+     "C": {
+      "type": "integer",
+      "title": "C",
+      "default": 0
+     },
+     "NEW": {
+      "type": "integer",
+      "title": "New",
+      "default": 0
+     },
+     "ungraded": {
+      "type": "integer",
+      "title": "Ungraded",
+      "default": 0
+     }
+    },
+    "type": "object",
+    "title": "GradeSummary"
+   },
+   "HTTPValidationError": {
+    "properties": {
+     "detail": {
+      "items": {
+       "$ref": "#/components/schemas/ValidationError"
+      },
+      "type": "array",
+      "title": "Detail"
+     }
+    },
+    "type": "object",
+    "title": "HTTPValidationError"
+   },
+   "MeOut": {
+    "properties": {
+     "id": {
+      "type": "string",
+      "title": "Id"
+     },
+     "email": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Email"
+     },
+     "display_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Display Name"
+     },
+     "has_profile": {
+      "type": "boolean",
+      "title": "Has Profile"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "email",
+     "display_name",
+     "has_profile"
+    ],
+    "title": "MeOut"
+   },
+   "Nutrients": {
+    "properties": {
+     "energy_kcal": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Energy Kcal"
+     },
+     "sodium_mg": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Sodium Mg"
+     },
+     "sugar_g": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Sugar G"
+     },
+     "saturated_fat_g": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Saturated Fat G"
+     },
+     "protein_g": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Protein G"
+     }
+    },
+    "type": "object",
+    "required": [
+     "energy_kcal",
+     "sodium_mg",
+     "sugar_g",
+     "saturated_fat_g",
+     "protein_g"
+    ],
+    "title": "Nutrients"
+   },
+   "ProfileIn": {
+    "properties": {
+     "health_conditions": {
+      "items": {
+       "type": "string",
+       "enum": [
+        "HYPERTENSION",
+        "DIABETES",
+        "HIGH_CHOLESTEROL"
+       ]
+      },
+      "type": "array",
+      "title": "Health Conditions",
+      "default": []
+     },
+     "dietary_restrictions": {
+      "items": {
+       "type": "string",
+       "enum": [
+        "NO_PORK",
+        "NO_BEEF",
+        "VEGETARIAN",
+        "HALAL"
+       ]
+      },
+      "type": "array",
+      "title": "Dietary Restrictions",
+      "default": []
+     },
+     "dietary_preferences": {
+      "items": {
+       "type": "string",
+       "enum": [
+        "HEALTHIER_CHOICE",
+        "LOWER_SODIUM"
+       ]
+      },
+      "type": "array",
+      "title": "Dietary Preferences",
+      "default": []
+     },
+     "budget_min": {
+      "anyOf": [
+       {
+        "type": "number",
+        "minimum": 0.0
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Budget Min"
+     },
+     "budget_max": {
+      "anyOf": [
+       {
+        "type": "number",
+        "minimum": 0.0
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Budget Max"
+     },
+     "hygiene_threshold": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/SafeGradeValue"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "preferred_regions": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Preferred Regions",
+      "default": []
+     }
+    },
+    "type": "object",
+    "title": "ProfileIn"
+   },
+   "ProfileOut": {
+    "properties": {
+     "health_conditions": {
+      "items": {
+       "type": "string",
+       "enum": [
+        "HYPERTENSION",
+        "DIABETES",
+        "HIGH_CHOLESTEROL"
+       ]
+      },
+      "type": "array",
+      "title": "Health Conditions",
+      "default": []
+     },
+     "dietary_restrictions": {
+      "items": {
+       "type": "string",
+       "enum": [
+        "NO_PORK",
+        "NO_BEEF",
+        "VEGETARIAN",
+        "HALAL"
+       ]
+      },
+      "type": "array",
+      "title": "Dietary Restrictions",
+      "default": []
+     },
+     "dietary_preferences": {
+      "items": {
+       "type": "string",
+       "enum": [
+        "HEALTHIER_CHOICE",
+        "LOWER_SODIUM"
+       ]
+      },
+      "type": "array",
+      "title": "Dietary Preferences",
+      "default": []
+     },
+     "budget_min": {
+      "anyOf": [
+       {
+        "type": "number",
+        "minimum": 0.0
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Budget Min"
+     },
+     "budget_max": {
+      "anyOf": [
+       {
+        "type": "number",
+        "minimum": 0.0
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Budget Max"
+     },
+     "hygiene_threshold": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/SafeGradeValue"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "preferred_regions": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Preferred Regions",
+      "default": []
+     },
+     "date_last_updated": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date-time"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Date Last Updated"
+     }
+    },
+    "type": "object",
+    "title": "ProfileOut"
+   },
+   "RecommendationItem": {
+    "properties": {
+     "stall": {
+      "$ref": "#/components/schemas/StallSummary"
+     },
+     "centre_name": {
+      "type": "string",
+      "title": "Centre Name"
+     },
+     "centre_region": {
+      "type": "string",
+      "title": "Centre Region"
+     },
+     "distance_km": {
+      "anyOf": [
+       {
+        "type": "number"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Distance Km"
+     },
+     "reasons": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Reasons"
+     }
+    },
+    "type": "object",
+    "required": [
+     "stall",
+     "centre_name",
+     "centre_region",
+     "distance_km",
+     "reasons"
+    ],
+    "title": "RecommendationItem"
+   },
+   "RecommendationOut": {
+    "properties": {
+     "generated_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Generated At"
+     },
+     "used_profile": {
+      "type": "boolean",
+      "title": "Used Profile"
+     },
+     "location_used": {
+      "type": "boolean",
+      "title": "Location Used"
+     },
+     "items": {
+      "items": {
+       "$ref": "#/components/schemas/RecommendationItem"
+      },
+      "type": "array",
+      "title": "Items"
+     },
+     "total_candidates": {
+      "type": "integer",
+      "title": "Total Candidates"
+     },
+     "excluded_closed": {
+      "type": "integer",
+      "title": "Excluded Closed"
+     },
+     "excluded_by_hygiene": {
+      "type": "integer",
+      "title": "Excluded By Hygiene"
+     },
+     "halal_only": {
+      "type": "boolean",
+      "title": "Halal Only",
+      "default": false
+     },
+     "halal_confirmed": {
+      "type": "integer",
+      "title": "Halal Confirmed",
+      "description": "Candidates with confirmed halal status when halal_only is on",
+      "default": 0
+     },
+     "excluded_by_halal": {
+      "type": "integer",
+      "title": "Excluded By Halal",
+      "default": 0
+     },
+     "disclaimer": {
+      "type": "string",
+      "title": "Disclaimer"
+     }
+    },
+    "type": "object",
+    "required": [
+     "generated_at",
+     "used_profile",
+     "location_used",
+     "items",
+     "total_candidates",
+     "excluded_closed",
+     "excluded_by_hygiene",
+     "disclaimer"
+    ],
+    "title": "RecommendationOut"
+   },
+   "RuleOut": {
+    "properties": {
+     "rule_id": {
+      "type": "string",
+      "title": "Rule Id"
+     },
+     "condition": {
+      "type": "string",
+      "title": "Condition"
+     },
+     "nutrient": {
+      "type": "string",
+      "title": "Nutrient"
+     },
+     "operator": {
+      "type": "string",
+      "title": "Operator"
+     },
+     "threshold": {
+      "type": "number",
+      "title": "Threshold"
+     },
+     "unit": {
+      "type": "string",
+      "title": "Unit"
+     },
+     "verdict": {
+      "$ref": "#/components/schemas/Verdict"
+     },
+     "status": {
+      "type": "string",
+      "title": "Status"
+     },
+     "citation": {
+      "type": "string",
+      "title": "Citation"
+     }
+    },
+    "type": "object",
+    "required": [
+     "rule_id",
+     "condition",
+     "nutrient",
+     "operator",
+     "threshold",
+     "unit",
+     "verdict",
+     "status",
+     "citation"
+    ],
+    "title": "RuleOut"
+   },
+   "SafeGradeOut": {
+    "properties": {
+     "grade_value": {
+      "$ref": "#/components/schemas/SafeGradeValue"
+     },
+     "under_review": {
+      "type": "boolean",
+      "title": "Under Review"
+     },
+     "snapshot_date": {
+      "type": "string",
+      "format": "date",
+      "title": "Snapshot Date"
+     }
+    },
+    "type": "object",
+    "required": [
+     "grade_value",
+     "under_review",
+     "snapshot_date"
+    ],
+    "title": "SafeGradeOut"
+   },
+   "SafeGradeValue": {
+    "type": "string",
+    "enum": [
+     "A",
+     "B",
+     "C",
+     "NEW"
+    ],
+    "title": "SafeGradeValue"
+   },
+   "SearchOut": {
+    "properties": {
+     "query": {
+      "type": "string",
+      "title": "Query"
+     },
+     "centres": {
+      "items": {
+       "$ref": "#/components/schemas/CentreSummary"
+      },
+      "type": "array",
+      "title": "Centres"
+     },
+     "stalls": {
+      "items": {
+       "$ref": "#/components/schemas/StallHit"
+      },
+      "type": "array",
+      "title": "Stalls"
+     },
+     "dishes": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array",
+      "title": "Dishes"
+     }
+    },
+    "type": "object",
+    "required": [
+     "query",
+     "centres",
+     "stalls",
+     "dishes"
+    ],
+    "title": "SearchOut"
+   },
+   "SourceFreshness": {
+    "properties": {
+     "source": {
+      "type": "string",
+      "enum": [
+       "NEA",
+       "SFA",
+       "HPB",
+       "REF"
+      ],
+      "title": "Source"
+     },
+     "label": {
+      "type": "string",
+      "title": "Label"
+     },
+     "last_success": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date-time"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Last Success"
+     },
+     "stale": {
+      "type": "boolean",
+      "title": "Stale"
+     },
+     "is_sample": {
+      "type": "boolean",
+      "title": "Is Sample"
+     }
+    },
+    "type": "object",
+    "required": [
+     "source",
+     "label",
+     "last_success",
+     "stale",
+     "is_sample"
+    ],
+    "title": "SourceFreshness"
+   },
+   "StallDetail": {
+    "properties": {
+     "id": {
+      "type": "integer",
+      "title": "Id"
+     },
+     "centre_id": {
+      "type": "integer",
+      "title": "Centre Id"
+     },
+     "stall_name": {
+      "type": "string",
+      "title": "Stall Name"
+     },
+     "unit_number": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Unit Number"
+     },
+     "cuisine": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Cuisine"
+     },
+     "price_range": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Price Range"
+     },
+     "safe_grade": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/SafeGradeOut"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "suspended_past_year": {
+      "type": "boolean",
+      "title": "Suspended Past Year"
+     },
+     "hdp_participant": {
+      "type": "boolean",
+      "title": "Hdp Participant"
+     },
+     "hdp_category": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Hdp Category"
+     },
+     "hdp_match_method": {
+      "anyOf": [
+       {
+        "type": "string",
+        "enum": [
+         "exact",
+         "fuzzy",
+         "override"
+        ]
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Hdp Match Method",
+      "description": "How the HPB listing was matched to this stall"
+     },
+     "halal": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Halal",
+      "description": "From the HPB listing. null = unknown, not non-halal"
+     },
+     "stall_type": {
+      "$ref": "#/components/schemas/StallType"
+     },
+     "contact_number": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Contact Number"
+     },
+     "licence_number": {
+      "type": "string",
+      "title": "Licence Number"
+     },
+     "licensee_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Licensee Name"
+     },
+     "centre": {
+      "$ref": "#/components/schemas/CentreSummary"
+     },
+     "track_record": {
+      "$ref": "#/components/schemas/TrackRecordOut"
+     },
+     "operating_hours_available": {
+      "type": "boolean",
+      "title": "Operating Hours Available",
+      "default": false
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "centre_id",
+     "stall_name",
+     "unit_number",
+     "cuisine",
+     "price_range",
+     "safe_grade",
+     "suspended_past_year",
+     "hdp_participant",
+     "hdp_category",
+     "stall_type",
+     "contact_number",
+     "licence_number",
+     "licensee_name",
+     "centre",
+     "track_record"
+    ],
+    "title": "StallDetail"
+   },
+   "StallHit": {
+    "properties": {
+     "id": {
+      "type": "integer",
+      "title": "Id"
+     },
+     "centre_id": {
+      "type": "integer",
+      "title": "Centre Id"
+     },
+     "stall_name": {
+      "type": "string",
+      "title": "Stall Name"
+     },
+     "unit_number": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Unit Number"
+     },
+     "cuisine": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Cuisine"
+     },
+     "price_range": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Price Range"
+     },
+     "safe_grade": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/SafeGradeOut"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "suspended_past_year": {
+      "type": "boolean",
+      "title": "Suspended Past Year"
+     },
+     "hdp_participant": {
+      "type": "boolean",
+      "title": "Hdp Participant"
+     },
+     "hdp_category": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Hdp Category"
+     },
+     "hdp_match_method": {
+      "anyOf": [
+       {
+        "type": "string",
+        "enum": [
+         "exact",
+         "fuzzy",
+         "override"
+        ]
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Hdp Match Method",
+      "description": "How the HPB listing was matched to this stall"
+     },
+     "halal": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Halal",
+      "description": "From the HPB listing. null = unknown, not non-halal"
+     },
+     "centre_name": {
+      "type": "string",
+      "title": "Centre Name"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "centre_id",
+     "stall_name",
+     "unit_number",
+     "cuisine",
+     "price_range",
+     "safe_grade",
+     "suspended_past_year",
+     "hdp_participant",
+     "hdp_category",
+     "centre_name"
+    ],
+    "title": "StallHit"
+   },
+   "StallSummary": {
+    "properties": {
+     "id": {
+      "type": "integer",
+      "title": "Id"
+     },
+     "centre_id": {
+      "type": "integer",
+      "title": "Centre Id"
+     },
+     "stall_name": {
+      "type": "string",
+      "title": "Stall Name"
+     },
+     "unit_number": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Unit Number"
+     },
+     "cuisine": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Cuisine"
+     },
+     "price_range": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Price Range"
+     },
+     "safe_grade": {
+      "anyOf": [
+       {
+        "$ref": "#/components/schemas/SafeGradeOut"
+       },
+       {
+        "type": "null"
+       }
+      ]
+     },
+     "suspended_past_year": {
+      "type": "boolean",
+      "title": "Suspended Past Year"
+     },
+     "hdp_participant": {
+      "type": "boolean",
+      "title": "Hdp Participant"
+     },
+     "hdp_category": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Hdp Category"
+     },
+     "hdp_match_method": {
+      "anyOf": [
+       {
+        "type": "string",
+        "enum": [
+         "exact",
+         "fuzzy",
+         "override"
+        ]
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Hdp Match Method",
+      "description": "How the HPB listing was matched to this stall"
+     },
+     "halal": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Halal",
+      "description": "From the HPB listing. null = unknown, not non-halal"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "centre_id",
+     "stall_name",
+     "unit_number",
+     "cuisine",
+     "price_range",
+     "safe_grade",
+     "suspended_past_year",
+     "hdp_participant",
+     "hdp_category"
+    ],
+    "title": "StallSummary"
+   },
+   "StallType": {
+    "type": "string",
+    "enum": [
+     "COOKED_FOOD",
+     "MARKET_PRODUCE",
+     "PIECE_AND_SUNDRIES"
+    ],
+    "title": "StallType"
+   },
+   "TrackRecordOut": {
+    "properties": {
+     "observation_window": {
+      "type": "string",
+      "title": "Observation Window",
+      "default": "Past 12 months"
+     },
+     "suspended_past_year": {
+      "type": "boolean",
+      "title": "Suspended Past Year"
+     },
+     "total_demerit_points": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Total Demerit Points",
+      "description": "SFA does not publish points per licensee, so this is null for now"
+     },
+     "grade_history": {
+      "items": {
+       "$ref": "#/components/schemas/SafeGradeOut"
+      },
+      "type": "array",
+      "title": "Grade History"
+     },
+     "last_updated": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Last Updated"
+     }
+    },
+    "type": "object",
+    "required": [
+     "suspended_past_year",
+     "grade_history",
+     "last_updated"
+    ],
+    "title": "TrackRecordOut"
+   },
+   "ValidationError": {
+    "properties": {
+     "loc": {
+      "items": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "integer"
+        }
+       ]
+      },
+      "type": "array",
+      "title": "Location"
+     },
+     "msg": {
+      "type": "string",
+      "title": "Message"
+     },
+     "type": {
+      "type": "string",
+      "title": "Error Type"
+     },
+     "input": {
+      "title": "Input"
+     },
+     "ctx": {
+      "type": "object",
+      "title": "Context"
+     }
+    },
+    "type": "object",
+    "required": [
+     "loc",
+     "msg",
+     "type"
+    ],
+    "title": "ValidationError"
+   },
+   "Verdict": {
+    "type": "string",
+    "enum": [
+     "SUITABLE",
+     "MODERATE",
+     "AVOID",
+     "INSUFFICIENT_DATA"
+    ],
+    "title": "Verdict"
+   },
+   "VisitIn": {
+    "properties": {
+     "stall_id": {
+      "type": "integer",
+      "title": "Stall Id"
+     },
+     "dish_type_id": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Dish Type Id"
+     },
+     "visit_date": {
+      "anyOf": [
+       {
+        "type": "string",
+        "format": "date"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Visit Date"
+     },
+     "rating": {
+      "anyOf": [
+       {
+        "type": "integer",
+        "maximum": 5.0,
+        "minimum": 1.0
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Rating"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "type": "string",
+        "maxLength": 300
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     }
+    },
+    "type": "object",
+    "required": [
+     "stall_id"
+    ],
+    "title": "VisitIn"
+   },
+   "VisitOut": {
+    "properties": {
+     "id": {
+      "type": "integer",
+      "title": "Id"
+     },
+     "stall_id": {
+      "type": "integer",
+      "title": "Stall Id"
+     },
+     "stall_name": {
+      "type": "string",
+      "title": "Stall Name"
+     },
+     "centre_name": {
+      "type": "string",
+      "title": "Centre Name"
+     },
+     "dish_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Dish Name"
+     },
+     "visit_date": {
+      "type": "string",
+      "format": "date",
+      "title": "Visit Date"
+     },
+     "rating": {
+      "anyOf": [
+       {
+        "type": "integer"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Rating"
+     },
+     "note": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Note"
+     }
+    },
+    "type": "object",
+    "required": [
+     "id",
+     "stall_id",
+     "stall_name",
+     "centre_name",
+     "dish_name",
+     "visit_date",
+     "rating",
+     "note"
+    ],
+    "title": "VisitOut"
+   }
+  }
+ }
+}

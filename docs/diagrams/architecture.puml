@@ -1,0 +1,90 @@
+@startuml CleanCravings_Architecture
+' SC2006 SCSL Group 4. System architecture (component view), prototype v0.2.
+!pragma layout smetana
+title CleanCravings - System Architecture
+skinparam componentStyle rectangle
+skinparam shadowing false
+' Top-to-bottom on purpose: smetana clips the top of the image in left-to-right mode
+
+actor User
+
+package "Frontend (React + Vite + TypeScript + Tailwind)" {
+  [HawkerCentreDiscoveryBoundary\n(Finder & Map)] as DiscB
+  [StallDetailBoundary\n(centre + stall pages, track record)] as StallB
+  [RecommendationBoundary\n(Home "for you", Dishes)] as RecB
+  [UserProfileBoundary\n(setup / edit preferences)] as ProfB
+  [ClosureAlertBoundary\n(Alerts)] as AlertB
+  [FavouriteBoundary / VisitLogBoundary\n(Saved, Profile)] as FavB
+  [Typed API client\n(types generated from OpenAPI)] as Client
+}
+
+cloud "Supabase Auth\n(Google sign-in)" as Auth
+cloud "OneMap\n(tiles + search)" as OneMap
+
+package "Backend (FastAPI)" {
+  [REST routers\n/api/*, /api/me/*] as API
+  [AuthenticationController\n(verifies Supabase JWT)] as AUTHC
+  [HawkerCentreController\nStallController] as HCC
+  [HygieneController] as HYC
+  [ClosureController] as CLC
+  [HealthierEatingController\n+ rule engine (rules as data)] as HEC
+  [RecommendationController] as RCC
+  [UserProfileController\nFavouriteController\nVisitController\nAlertController] as UPC
+}
+
+database "PostgreSQL (Supabase)\nRLS on every table, no policies\nSQLite for local dev" as DB
+
+package "ETL (Python, GitHub Actions cron, daily 02:00 SGT)" {
+  [NEASyncController\netl/nea_sync.py] as NEA
+  [SFASyncController\netl/sfa_import.py] as SFA
+  [HPBSyncController\netl/hpb_partners_sync.py] as HPB
+  [Reference data\nrules + dish CSVs] as REF
+}
+
+cloud "data.gov.sg\n(NEA closure dates,\nHPB Healthier Dining Partners)" as DGS
+cloud "SFA Track Records\n(Excel export)" as SFAPortal
+
+User --> DiscB
+User --> StallB
+User --> RecB
+User --> ProfB
+User --> AlertB
+User --> FavB
+DiscB --> Client
+StallB --> Client
+RecB --> Client
+ProfB --> Client
+AlertB --> Client
+FavB --> Client
+Client --> API : HTTPS JSON\n(Bearer token)
+Client ..> Auth : sign in with Google
+DiscB ..> OneMap : map tiles
+API --> AUTHC
+AUTHC ..> Auth : verify JWT (JWKS)
+API ..> OneMap : geocode proxy
+API --> HCC
+API --> HYC
+API --> CLC
+API --> HEC
+API --> RCC
+API --> UPC
+HCC --> DB
+HYC --> DB
+CLC --> DB
+HEC --> DB
+RCC --> DB
+UPC --> DB
+NEA --> DGS
+HPB --> DGS
+SFA --> SFAPortal
+NEA --> DB
+SFA --> DB
+HPB --> DB
+REF --> DB
+
+note bottom of DB
+  The backend connects as the table owner, so RLS
+  doesn't apply to it. Supabase's public REST API
+  (anon / authenticated roles) can't read any table.
+end note
+@enduml

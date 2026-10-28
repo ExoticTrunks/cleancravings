@@ -1,0 +1,69 @@
+@startuml CleanCravings_DialogMap
+' SC2006 SCSL Group 4. Dialog map (UI state machine) matching frontend/src/main.tsx routes.
+' States are screens, transitions are user actions or system events.
+!pragma layout smetana
+title CleanCravings - Dialog Map (v2, as implemented)
+skinparam shadowing false
+hide empty description
+left to right direction
+
+skinparam state {
+  BackgroundColor #FBF7F0
+  BorderColor #7A2E1F
+}
+
+state "Launch" as Launch
+state "Sign in\n/signin\n(Continue with Google)" as SignIn #F2EEE6
+state "Preference setup\n/setup\n[login required]" as Setup #F2EEE6
+state "Home (For you)\n/\nrecommendations, dish teaser" as Home #EDEBFB
+state "Finder & Map\n/finder\nsearch, filters, map, results" as Finder #E3F4EC
+state "Dishes\n/dishes\nratings for your profile" as Dishes #E3F4EC
+state "Saved\n/saved\n[login required]" as Saved #E3F4EC
+state "Profile\n/profile\naccessibility settings (also for guests),\nprofile + visit history [login required]" as Profile #E3F4EC
+state "Alerts\n/alerts\n[login required]" as Alerts #E3F4EC
+state "Hawker centre detail\n/centres/:id" as Centre #FBE9E3
+state "Stall detail\n/stalls/:id\nSAFE grade, track record,\nHealthier Dining, log a visit" as Stall #FBE9E3
+state "Edit preferences\n/profile/edit\n[login required]" as Edit #E6F0FA
+state "Maps app\n(external: Google Maps / OneMap)" as Maps #FFFFFF
+
+[*] --> Launch
+Launch --> Home : session valid\nor guest
+Home --> SignIn : Sign in
+SignIn --> Home : Google sign-in done\nor continue as guest
+Home --> Setup : "Set up your health profile"\n(signed in, no profile yet)
+Setup --> Home : save or skip
+
+Home --> Finder : Finder & Map tab
+Home --> Dishes : Dishes tab / See all
+Home --> Saved : Saved tab
+Home --> Profile : Profile tab
+Home --> Alerts : bell icon (signed in)
+Home --> Stall : tap recommended stall
+
+Finder --> Centre : tap centre card\nor map pin
+Finder --> Stall : tap stall result
+Finder --> Dishes : tap dish result
+Finder --> Finder : adjust filters /\nchange location
+
+Centre --> Stall : tap stall
+Centre --> Centre : grade / Healthier Dining /\nconfirmed halal filters
+Centre --> Maps : Open in Maps / OneMap
+Stall --> Centre : tap parent centre
+Stall --> Stall : log a visit (inline form)
+
+Dishes --> Dishes : toggle conditions,\nexpand dish card
+
+Saved --> Centre : tap saved centre
+Saved --> Stall : tap saved stall
+Saved --> Dishes : tap saved dish
+
+Alerts --> Centre : tap alert\n(marks it read)
+
+Profile --> Edit : Edit preferences
+Edit --> Profile : save or cancel\n(confirm discard if unsaved)
+Profile --> Stall : tap logged visit
+Profile --> Home : Sign out
+
+note "Guests: [login required] screens show a\n'Sign in to ...' prompt linking to Sign in;\nBookmark and Log a visit go straight to Sign in." as N1
+note "The tab bar (For you, Finder & Map, Dishes,\nSaved, Profile) and the back button are on\nevery screen; only Home's tab edges are drawn." as N2
+@enduml

@@ -1,0 +1,29 @@
+# Daily data sync into Supabase Postgres. Runs outside the request path; each run is
+# logged in the sync_run table and in Actions history (evidence for NFR-2 / NFR-9).
+name: ETL sync
+
+on:
+  schedule:
+    - cron: "0 18 * * *" # 02:00 Singapore time
+  workflow_dispatch:
+  push:
+    paths: ["backend/etl/inbox/**"] # someone dropped a new SFA export
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DATA_GOV_API_KEY: ${{ secrets.DATA_GOV_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - run: pip install -r requirements.txt
+      - run: python -m etl.run_all

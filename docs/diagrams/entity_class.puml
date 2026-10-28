@@ -1,0 +1,234 @@
+@startuml CleanCravings_EntityClassDiagram
+' SC2006 SCSL Group 4. Entity classes as implemented in backend/app/models.py
+' (attribute names match the code). Update this file when models.py changes.
+!pragma layout smetana
+title CleanCravings - Entity Class Diagram (as implemented)
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+hide empty methods
+
+package "Places & Operators" #FBF3D5 {
+  class HawkerCentre <<entity>> {
+    - id: int  {NEA dataset _id}
+    - centre_name: String
+    - street_address: String [0..1]
+    - postal_code: String [0..1]
+    - region: String
+    - latitude: float
+    - longitude: float
+    - number_of_stalls: int
+    - photo_url: String [0..1]
+    - nea_status: String
+  }
+  class Stall <<entity>> {
+    - id: int
+    - stall_name: String
+    - unit_number: String [0..1]
+    - stall_type: StallType
+    - cuisine: String [0..1]
+    - price_range: String [0..1]
+    - contact_number: String [0..1]
+    - halal: Boolean [0..1]  {null = unknown}
+  }
+  class Licensee <<entity>> {
+    - licence_number: String  {key}
+    - licensee_name: String [0..1]
+    - licence_status: String  {active / suspended}
+    - last_seen_snapshot: Date [0..1]
+  }
+  enum StallType {
+    COOKED_FOOD
+    MARKET_PRODUCE
+    PIECE_AND_SUNDRIES
+  }
+}
+
+package "Food Safety & Hygiene" #FADBD8 {
+  class SAFEGrade <<entity>> {
+    - grade_value: SafeGradeValue
+    - under_review: Boolean
+    - suspended_past_year: Boolean
+    - snapshot_date: Date
+  }
+  enum SafeGradeValue {
+    A
+    B
+    C
+    NEW
+  }
+}
+
+package "Closures" #D6DBDF {
+  class ClosurePeriod <<entity>> {
+    - start_date: Date
+    - end_date: Date
+    - reason_type: ClosureReasonType
+    - remarks: String [0..1]
+    - quarter: String [0..1]  {Q1..Q4}
+    - year: int [0..1]
+    + is_active(today: Date): Boolean
+  }
+  enum ClosureReasonType {
+    SPRING_CLEANING
+    REPAIRS_AND_REDECORATION
+    OTHER_WORKS
+  }
+}
+
+package "Healthier Eating" #D5F5E3 {
+  class ParticipatingStall <<entity>> {
+    - outlet_name: String
+    - postal_code: String [0..1]
+    - participation_category: String [0..1]
+    - match_method: String [0..1]  {exact / fuzzy / override}
+  }
+  class DishType <<entity>> {
+    - dish_name: String
+    - category: String
+    - serving_g: float [0..1]
+    - energy_kcal: float [0..1]
+    - sodium_mg: float [0..1]
+    - sugar_g: float [0..1]
+    - saturated_fat_g: float [0..1]
+    - protein_g: float [0..1]
+    - contains_pork: Boolean
+    - contains_beef: Boolean
+    - is_vegetarian: Boolean
+    - source: String
+  }
+  class ClassificationRule <<entity>> {
+    - rule_id: String  {key}
+    - condition: String  {GENERAL, HYPERTENSION, ...}
+    - nutrient: String
+    - operator: String  {<, <=, >, >=}
+    - threshold: float
+    - unit: String
+    - verdict: Verdict
+    - citation: String
+    - status: String  {draft / reviewed}
+  }
+  enum Verdict {
+    SUITABLE
+    MODERATE
+    AVOID
+    INSUFFICIENT_DATA
+  }
+}
+
+package "User & Personalisation" #D6EAF8 {
+  class User <<entity>> {
+    - id: String  {Supabase auth uid}
+    - email: String [0..1]
+    - display_name: String [0..1]
+  }
+  class UserProfile <<entity>> {
+    - health_conditions: List<String>
+    - dietary_restrictions: List<String>  {NO_PORK, NO_BEEF, VEGETARIAN, HALAL}
+    - dietary_preferences: List<String>  {HEALTHIER_CHOICE, LOWER_SODIUM}
+    - budget_min: float [0..1]
+    - budget_max: float [0..1]
+    - hygiene_threshold: SafeGradeValue [0..1]
+    - preferred_regions: List<String>
+    - date_created: DateTime
+    - date_last_updated: DateTime
+  }
+  class Favourite <<entity>> {
+    - target_type: FavouriteTarget
+    - target_id: int
+    - date_saved: DateTime
+  }
+  class Visit <<entity>> {
+    - visit_date: Date
+    - rating: int [0..1]  {1..5}
+    - note: String [0..1]
+  }
+  class ClosureAlert <<entity>> {
+    - message: String
+    - sent_timestamp: DateTime
+    - read_status: Boolean
+  }
+  enum FavouriteTarget {
+    CENTRE
+    STALL
+    DISH
+  }
+}
+
+package "Data Operations" #EAEDED {
+  class SyncRun <<entity>> {
+    - source: String  {NEA / SFA / HPB / REF}
+    - started_at: DateTime
+    - finished_at: DateTime [0..1]
+    - status: String  {running / ok / failed}
+    - rows: int
+    - is_sample: Boolean
+    - detail: String [0..1]
+  }
+}
+
+HawkerCentre "1" *-- "0..*" Stall : contains
+HawkerCentre "1" *-- "0..*" ClosurePeriod : has
+Licensee "1" -- "1..*" Stall : operates
+Stall --> "1" StallType : classified as
+Licensee "1" *-- "0..*" SAFEGrade : graded in\n(one per SFA snapshot)
+SAFEGrade --> "1" SafeGradeValue
+ClosurePeriod --> "1" ClosureReasonType : has reason
+HawkerCentre "0..1" -- "0..*" ParticipatingStall : listed at
+Stall "0..1" -- "0..1" ParticipatingStall : matched to
+ClassificationRule --> "1" Verdict
+ClassificationRule ..> DishType : evaluated against\nnutrients of
+
+User "1" *-- "0..1" UserProfile : has
+User "1" *-- "0..*" Favourite : saves
+User "1" *-- "0..*" Visit : records
+User "1" *-- "0..*" ClosureAlert : receives
+UserProfile ..> SafeGradeValue : hygiene threshold
+Favourite --> "1" FavouriteTarget
+Favourite ..> HawkerCentre : refers to\n(target_type = CENTRE)
+Favourite ..> Stall : refers to\n(target_type = STALL)
+Favourite ..> DishType : refers to\n(target_type = DISH)
+Visit "0..*" --> "1" Stall : at
+Visit "0..*" --> "0..1" DishType : dish eaten
+ClosureAlert "0..*" --> "1" ClosurePeriod : triggered by
+
+note bottom of SAFEGrade
+  The newest snapshot is the current grade;
+  older ones form the grade history (FR-2.3).
+  Track Record isn't stored: HygieneController
+  builds it from these snapshots. SFA doesn't
+  publish demerit points, only a "suspended in
+  the past year" flag.
+end note
+
+note bottom of ClosurePeriod
+  Active Closure is derived:
+  is_active(today). Stalls in an actively
+  closed centre are left out of
+  Recommendations (FR-3.3).
+end note
+
+note bottom of UserProfile
+  Dietary Restriction, Dietary Preference,
+  Budget Range and Hygiene Threshold from the
+  data dictionary are stored as fields on
+  UserProfile instead of separate classes.
+end note
+
+note top of ParticipatingStall
+  From HPB's Healthier Dining Partners list.
+  Placed at a centre by postal code, linked to
+  a Stall by name (stall_id null = centre-level).
+end note
+
+note as NotBuilt
+  <b>In the data dictionary, not implemented</b>
+  (no open dataset provides the data):
+  OperatingHours, Dish (per stall), LowerCalorieDish,
+  HealthierIngredient, HealthierChoiceSymbol,
+  DemeritPoints, Suspension, MajorLapse.
+  <b>Computed per request, not stored:</b>
+  Recommendation, RecommendationScore, Search,
+  TrackRecord, Active Closure, Region (from coordinates).
+end note
+@enduml

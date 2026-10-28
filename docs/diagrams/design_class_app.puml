@@ -1,0 +1,234 @@
+@startuml CleanCravings_DesignClassDiagram_App
+' SC2006 SCSL Group 4. Design class diagram for the request path (Boundary -> Control -> Entity).
+' Boundaries are React pages (frontend/src/pages), controls are backend/app/controllers.
+' Boundaries never touch entities directly: every request goes through the API (NFR-5).
+!pragma layout smetana
+title CleanCravings - Design Class Diagram (request path)
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+hide empty members
+
+package "Boundary (frontend/src/pages)" #EDEBFB {
+  class HomePage <<boundary>> {
+    RecommendationBoundary
+    --
+    + showRecommendations(lat, lng)
+    + showDishTeaser()
+  }
+  class FinderPage <<boundary>> {
+    HawkerCentreDiscoveryBoundary
+    --
+    + searchCentres(q, region, minGrade, radius)
+    + searchStallsAndDishes(term)
+    + showMap(centres)
+  }
+  class CentreDetailPage <<boundary>> {
+    + showCentre(id, minGrade, halalOnly)
+    + openInMaps()
+  }
+  class StallDetailPage <<boundary>> {
+    StallDetailBoundary
+    --
+    + showStall(id)
+    + logVisit(rating, note, dish)
+  }
+  class DishesPage <<boundary>> {
+    + showDishes(conditions, restrictions)
+  }
+  class SignInPage <<boundary>> {
+    SessionBoundary
+    --
+    + signInWithGoogle()
+    + continueAsGuest()
+  }
+  class ProfileEditPage <<boundary>> {
+    UserProfileBoundary
+    --
+    + saveProfile(profile)
+  }
+  class ProfilePage <<boundary>> {
+    VisitLogBoundary + accessibility settings
+    --
+    + showVisits()
+    + setTheme(theme)
+    + setTextSize(size)
+    + signOut()
+  }
+  class SavedPage <<boundary>> {
+    FavouriteBoundary
+    --
+    + showFavourites()
+  }
+  class AlertsPage <<boundary>> {
+    ClosureAlertBoundary
+    --
+    + showAlerts()
+    + markRead(id)
+  }
+  class ApiClient <<boundary>> {
+    frontend/src/lib/api.ts
+    types generated from OpenAPI
+    --
+    + request(method, path, query, body)
+  }
+}
+
+package "API: backend/app/routers + auth" #FDEBD0 {
+  class PublicRouter <<boundary>> {
+    /api/... (no login, FR-0.1)
+    --
+    GET /centres, /centres/{id}
+    GET /stalls/{id}, /search
+    GET /dishes, /rules, /recommendations
+    GET /meta/freshness, /geocode
+  }
+  class MeRouter <<boundary>> {
+    /api/me/... (login required, FR-0.2)
+    --
+    GET, PUT /profile
+    GET, POST, DELETE /favourites
+    GET, POST /visits
+    GET /alerts, POST /alerts/{id}/read
+  }
+  class AuthenticationController <<control>> {
+    + optional_user(authorization): User [0..1]
+    + require_user(user): User
+    - _decode(token): claims  {Supabase JWT via JWKS}
+  }
+}
+
+package "Control (backend/app/controllers)" #D5F5E3 {
+  class HawkerCentreController <<control>> {
+    + list_centres(db, today, q, region, min_grade, origin, radius_km): List<CentreSummary>
+    + centre_detail(db, centre_id, today, min_grade, halal_only): CentreDetail
+    + search(db, q, today): SearchOut
+    + hdp_counts(db): Map<int, int>
+  }
+  class StallController <<control>> {
+    + stall_detail(db, stall_id, today): StallDetail
+  }
+  class HygieneController <<control>> {
+    + GRADE_RANK: A > B > NEW > C
+    + current_grade(licensee): SAFEGrade [0..1]
+    + passes_threshold(stall, threshold): Boolean
+    + summary(stalls): GradeSummary
+    + track_record(stall): TrackRecordOut
+  }
+  class ClosureController <<control>> {
+    + centre_status(centre, today): CentreStatus
+    + closed_centre_ids(db, today): Set<int>
+    + generate_alerts(db, today): int
+  }
+  class HealthierEatingController <<control>> {
+    + load_rules(db): List<Rule>
+    + assess_dishes(db, conditions, restrictions, prefer_lower_sodium): DishListOut
+  }
+  class RecommendationController <<control>> {
+    + recommend(db, today, user, origin, limit): RecommendationOut
+  }
+  class UserProfileController <<control>> {
+    + get(db, user): ProfileOut [0..1]
+    + save(db, user, data): ProfileOut
+  }
+  class FavouriteController <<control>> {
+    + list(db, user, today): List<FavouriteOut>
+    + add(db, user, data, today): FavouriteOut
+    + remove(db, user, fav_id)
+  }
+  class VisitController <<control>> {
+    + add(db, user, data, today): VisitOut
+    + list(db, user): List<VisitOut>
+  }
+  class AlertController <<control>> {
+    + list(db, user, today): List<AlertOut>
+    + mark_read(db, user, alert_id)
+  }
+  class Presenters <<control>> {
+    + stall_summary(stall): StallSummary
+    + centre_summary(centre, today, origin, hdp_count): CentreSummary
+    + wants_halal(profile): Boolean
+    + confirmed_halal(stall): Boolean
+  }
+  class RuleEngine <<control>> {
+    backend/app/rules/engine.py
+    --
+    + evaluate(nutrients, rules, conditions): Assessment
+  }
+}
+
+package "Entity (details in the entity class diagram)" #D6EAF8 {
+  class HawkerCentre <<entity>>
+  class Stall <<entity>>
+  class Licensee <<entity>>
+  class SAFEGrade <<entity>>
+  class ClosurePeriod <<entity>>
+  class ParticipatingStall <<entity>>
+  class DishType <<entity>>
+  class ClassificationRule <<entity>>
+  class User <<entity>>
+  class UserProfile <<entity>>
+  class Favourite <<entity>>
+  class Visit <<entity>>
+  class ClosureAlert <<entity>>
+}
+
+HomePage ..> ApiClient
+FinderPage ..> ApiClient
+CentreDetailPage ..> ApiClient
+StallDetailPage ..> ApiClient
+DishesPage ..> ApiClient
+SignInPage ..> ApiClient
+ProfileEditPage ..> ApiClient
+ProfilePage ..> ApiClient
+SavedPage ..> ApiClient
+AlertsPage ..> ApiClient
+ApiClient ..> PublicRouter : HTTPS JSON
+ApiClient ..> MeRouter : HTTPS JSON\n+ Bearer token
+
+PublicRouter ..> AuthenticationController
+MeRouter ..> AuthenticationController
+PublicRouter ..> HawkerCentreController
+PublicRouter ..> StallController
+PublicRouter ..> HealthierEatingController
+PublicRouter ..> RecommendationController
+MeRouter ..> UserProfileController
+MeRouter ..> FavouriteController
+MeRouter ..> VisitController
+MeRouter ..> AlertController
+
+HawkerCentreController ..> HygieneController
+HawkerCentreController ..> Presenters
+StallController ..> HygieneController
+RecommendationController ..> HygieneController
+RecommendationController ..> ClosureController
+RecommendationController ..> Presenters
+Presenters ..> HygieneController
+Presenters ..> ClosureController
+HealthierEatingController ..> RuleEngine
+FavouriteController ..> ClosureController
+AlertController ..> ClosureController
+
+HawkerCentreController ..> HawkerCentre
+HawkerCentreController ..> ParticipatingStall
+StallController ..> Stall
+HygieneController ..> Licensee
+HygieneController ..> SAFEGrade
+ClosureController ..> ClosurePeriod
+ClosureController ..> ClosureAlert
+HealthierEatingController ..> DishType
+HealthierEatingController ..> ClassificationRule
+RecommendationController ..> UserProfile
+RecommendationController ..> Visit
+UserProfileController ..> UserProfile
+FavouriteController ..> Favourite
+VisitController ..> Visit
+AlertController ..> ClosureAlert
+AuthenticationController ..> User
+
+note right of RecommendationController
+  Returns an ordered list with plain-language
+  reasons; the score itself is never sent to
+  the client (NFR-6).
+end note
+@enduml

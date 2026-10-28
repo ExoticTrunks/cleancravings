@@ -1,0 +1,108 @@
+outlet_id,outlet_name,sfa_licence_number,sfa_name,centre,method,score,runner_up_score,distinct_score,outlet_address
+2029,Ah Yin Lao Huo Tang,UB10177002,Ah Ying Loa Huo Tang,Upper Boon Keng Road Blk 17 (Blk 17 Upper Boon Keng Market and Food Centre),fuzzy,0.903,0.432,0.903,17 Upper Boon Keng Road #01-01 Singapore 380017
+3378,"Hainanese Chicken Rice, Porridge, Noodle",HOM0122003,Xiang Ji Hainanese Chicken Rice. Porridge. Noodle,Holland Village Market and Food Centre,fuzzy,0.907,0.407,0.000,1 Lorong Mambong Singapore 277700
+1940,Healthy Yong Tau Fu,BE10134002,Healthy Yong Tau Foo,Bendemeer Road Blk 29 (Bendemeer Market and Food Centre),fuzzy,0.909,0.467,1.000,29 Bendemeer Road #01-01 Singapore 330029
+2824,Tong Noodle House,CL401174003,Hai Tong Noodle House,Clementi West Street 2 Blk 726,fuzzy,0.909,0.667,0.857,726 Clementi West Street 2 Singapore 120726
+2828,Hup Heng Noodle House,CL401182003,Hup Heng Noodle Ho,Clementi West Street 2 Blk 726,fuzzy,0.909,0.778,0.857,726 Clementi West Street 2 Singapore 120726
+3483,Loong Kee Yong Tau Fu,JW10131004,LOONG KEE YONG TAU FOO,Jurong West Street 52 Blk 505,fuzzy,0.914,0.412,1.000,505 Jurong West Street 52 Singapore 640505
+1951,Hong Kong Soy Sauce Chicken Rice & Noodle,BE10173003,YIT LIM HONG KONG SOY SAUCE CHICKEN RICE & NOODLE,Bendemeer Road Blk 29 (Bendemeer Market and Food Centre),fuzzy,0.917,0.604,0.842,29 Bendemeer Road #01-01 Singapore 330029
+2106,Katong [Jago] Teochew Mee Pok Kway Teow Mee,MPC0109001,Katong Jago Teochew Mee Kuay Teow Mee,Marine Parade Central Blk 84 (84 Marine Parade Central Market and Food Centre),fuzzy,0.923,0.317,0.872,84 Marine Parade Central #01-01 Singapore 440084
+2152,Lim Hai Sheng Carrot Cake,BN10149003,Hai Sheng Carrot Cake,Bedok North Street 1 Blk 216,fuzzy,0.923,0.531,0.923,216 Bedok North Street 1 #01-01 Singapore 460216
+2723,Redhill Prawn Noodle,RH20195004,85 Redhill Prawn Noodles,Redhill Lane Blk 85 (Redhill Food Centre),fuzzy,0.923,0.649,0.875,85 Redhill Lane Singapore 150085
+3358,Yap Kee Wanton Egg Noodles,HO20204003,Yap Kee Wanton Noodles,Holland Drive Blk 44 (Holland Drive Market and Food Centre),fuzzy,0.927,0.359,0.800,44 Holland Drive Singapore 270044
+2674,Asia Ghani Jamu Selera Chicken,ML10131003,asia ghani jamu selera chicken rice,Marsiling Lane Blk 20/21,fuzzy,0.929,0.538,0.844,20 Marsiling Lane Singapore 730020
+2814,35 Fried Mee Hoon,TP10235003,35 Fried Beehoon,Toa Payoh Lorong 1 Blk 127 (Toa Payoh West Market and Food Court),fuzzy,0.929,0.444,0.880,127 Toa Payoh Lorong 1  Singapore 310127
+2341,Alham Family Food,JE101194002,ALHAM FAMILI FOOD,Jurong East Ave 1 Blk 347 (Yuhua Market and Hawker Centre),fuzzy,0.933,0.462,0.909,347 Jurong East Avenue 1 #01-171 Singapore 600347
+2475,Zheng Tian Tian Yong Tau Fu,WE20102003,Zheng Tian Tian Yong Tau Foo,West Coast Drive Blk 503 (Ayer Rajah Food Centre),fuzzy,0.933,0.389,1.000,503 West Coast Drive Singapore 120503
+2892,Fauziah’s,PPF0120006,fauziah,Pasir Panjang Food Centre,fuzzy,0.933,0.400,0.933,121 Pasir Panjang Road Singapore 118543
+3256,Sunny Vegetarian,TJ20213002,Sunny Vegeterian,Tanjong Pagar Plaza Blk 6 (Blk 6 Tanjong Pagar Plaza Market and Food Centre),fuzzy,0.933,0.348,0.933,6 Tanjong Pagar Plaza Singapore 081006
+3595,Ri Ri Xing,BL201142003,Ri Ri Xin,Boon Lay Place Blk 221A/B (Boon Lay Place Market and Food Village),fuzzy,0.933,0.571,0.933,221A Boon Lay Place Singapore 641221
+2038,Rahmah Muslim Food,SI10112002,Rahman Muslim Food,Sims Place Blk 49 (Sims Vista Market and Food Centre),fuzzy,0.938,0.400,0.833,49 Sims Place #01-01 Singapore 380049
+2048,Mah Wah Cooked Food,SI10133002,Moh Wah Cooked Food,Sims Place Blk 49 (Sims Vista Market and Food Centre),fuzzy,0.938,0.786,0.917,49 Sims Place #01-01 Singapore 380049
+2133,Ji Shen Cooked Food,BS20160003,Ji Sjen Cooked Food,Bedok South Road Blk 16,fuzzy,0.938,0.800,0.917,16 Bedok South Road #01-01 Singapore 460016
+3206,Morning Bak Kut Tea,UC10172003,Morning Bak Kut Teh,Upper Cross Street Blk 531A (Hong Lim Food Centre and Market),fuzzy,0.938,0.424,0.938,531A Upper Cross Street Singapore 051531
+2015,Bai Li Shun Fish Soup,UB10131002,Bai Ii Shun Fish Soup,Upper Boon Keng Road Blk 17 (Blk 17 Upper Boon Keng Market and Food Centre),fuzzy,0.941,0.421,0.941,17 Upper Boon Keng Road #01-01 Singapore 380017
+2969,Non Nasi Ala Kampung,MD10126001,Nor Nasi Ala Kampung,Margaret Drive Hawker Centre,fuzzy,0.941,0.360,0.923,38A Margaret Drive Singapore 142038
+3499,Da Pai Dang,TG10117003,Da Pai Dan,Teban Gardens Road Blk 37A (Teban Gardens Market and Food Centre),fuzzy,0.941,0.500,0.941,37A Teban Gardens Road Singapore 601037
+2868,Hawker Ah Hua Fish Ball Noodle,TB101131003,ABC Hawker Ah Hua Fishball Noodle,Telok Blangah Crescent Blk 11 (11 Telok Blangah Crescent Market and Food Centre),fuzzy,0.943,0.531,0.880,11 Telok Blangah Crescent  Singapore 090011
+3023,Lorong Ah Soo Cheu Kee,AM501139003,Lorong Ah Soo Chew Kee,Ang Mo Kio Ave 10 Blk 527 (Cheng San Market and Cooked Food Centre),fuzzy,0.944,0.432,0.944,527 Ang Mo Kio Avenue 10 Singapore 560527
+2957,Bukit Merah View Fish Ball Minced Noodles,TB40134002,Bukit Merah View Fishball Minced Meat Noodles,Telok Blangah Rise Blk 36 (Telok Blangah Rise Market),fuzzy,0.946,0.393,0.909,36 Telok Blangah Rise Singapore 090036
+1894,Zheng De Hao,BM501108003,Zhen De Hao,Jalan Bukit Merah Blk 6 (ABC Brickworks Market/Food Centre),fuzzy,0.947,0.571,0.947,6 Jalan Bukit Merah #01-01 Singapore 150006
+3393,Maya Pesona Chicken Rice & Seafood,GS102154003,Maya Pesona Chicken Rice and Seafood,Geylang Serai Market,fuzzy,0.949,0.604,0.919,1 Geylang Serai Singapore 402001
+3374,Holland V. Fried Bee Hoon,HOM0111003,Hooland V. Fried Bee Hoon,Holland Village Market and Food Centre,fuzzy,0.950,0.619,0.950,1 Lorong Mambong Singapore 277700
+2449,Hainanese Chicken Rice,BN40134004,85 Hainanese Chicken Rice,Bedok North Street 4 Blk 85 (85 Fengshan Centre),fuzzy,0.952,0.678,0.000,85 Bedok North Street 4 Singapore 460085
+2832,Wang Jiao Handmode Noodle,CL401193003,Wang Jiao Handmade Noodle,Clementi West Street 2 Blk 726,fuzzy,0.955,0.478,0.938,726 Clementi West Street 2 Singapore 120726
+3102,Hao Ji Contonese Porridge,CI601114003,Hao Ji Cantonese Porridge,Circuit Road Blk 89,fuzzy,0.955,0.524,0.929,89 Circuit Road Singapore 370089
+3154,Han Jia Bak Kut The/ Pork Leg,ECF042003,Han Jia Bak Kut Teh. Pork Leg,East Coast Lagoon Food Village,fuzzy,0.955,0.522,0.955,1220 East Coast Parkway Singapore 468960
+2085,Mami Junaida,EU10120003,Mami Junaidah,Eunos Crescent Blk 4A,fuzzy,0.957,0.519,0.957,4A Eunos Crescent #01-01 Singapore 402004
+2488,Sheikh’s Curry,WE20150003,SHEIKH CURRY,West Coast Drive Blk 503 (Ayer Rajah Food Centre),fuzzy,0.957,0.364,0.957,503 West Coast Drive Singapore 120503
+2849,Warong Azizah,JK10106005,Wrong azizah,Jalan Kukoh Blk 1 (Kukoh 21 Food Centre),fuzzy,0.957,0.348,0.957,1 Jalan Kukoh Singapore 161001
+3333,Yuan Cheng Fried Carrot Cake,TB20133003,Yuen Cheng Fried Carrot Cake,Telok Blangah Drive Blk 79 (Telok Blangah Food Centre),fuzzy,0.958,0.453,0.958,79 Telok Blangah Drive Singapore 100079
+2923,Ivan’s Porridge,HL10111002,Ivan Porridge,Havelock Road Blk 22A/B (Havelock Road Cooked Food Centre),fuzzy,0.960,0.400,0.889,22A Havelock Road Singapore 161022
+3719,Ji Feng Mei Shi,SM102119004,Jin Feng Mei Shi,Smith Street Blk 335 (Chinatown Complex Market),fuzzy,0.960,0.696,0.960,335 Smith Street Singapore 050335
+2171,Fei Lou Ban Mian,NC101175004,Fei Lou Bian Mian,New Upper Changi Road Blk 58,fuzzy,0.963,0.485,0.963,58 New Upper Changi Road #01-148 Singapore 461058
+2706,Hong Kong Style Fish Head Bee Hoon. Special Side Dish,RH20112003,Hong Kong Style Fish Head Bee Hoon. Special Side D,Redhill Lane Blk 85 (Redhill Food Centre),fuzzy,0.964,0.500,0.964,85 Redhill Lane Singapore 150085
+2332,Tian Fa Economic Bee Hoon & Noodle,JE20150003,Tian Fa Economical Bee Hoon/Noodle,Jurong East Street 24 Blk 254 (Yuhua Village Market and Food Centre),fuzzy,0.964,0.478,0.955,254 Jurong East Street 24 #01-01 Singapore 600254
+3086,Xiang Yuan Shu Shi,CI50203003,Xiang Yuan Su Shi,Circuit Road Blk 80 (80 Circuit Road Market and Food Centre),fuzzy,0.966,0.421,0.966,80 Circuit Road Singapore 370080
+3651,Pirates’s Seafood,NTF0156003,Pirate's Seafood,Newton Food Centre,fuzzy,0.966,0.667,0.966,500 Clemenceau Avenue North Singapore 229495
+3239,Hai Ji Nasi Lemak/ Economic Bee Hoon,AMO061003,Hai Ji Nasi Lemak & Economical Bee Hoon,Amoy Street Food Centre (Telok Ayer Food Centre),fuzzy,0.967,0.522,0.962,7 Maxwell Road Singapore 069111
+3274,Market Street Teochew Kway Teow Mee,MSH0217001,Market Street Teochew Kuay Teow Mee,Market Street Hawker Centre,fuzzy,0.967,0.549,0.950,86 Market Street  Singapore 048947
+2635,Mixed Vegetable Rice. Teochew Porridge,AMA0112004,Mix Vegetable Rice.Teochew Porridge,Ang Mo Kio Street 22 Blk 226H (Kebun Baru Food Centre),fuzzy,0.969,0.271,0.941,226H Ang Mo Kio Street 22 Singapore 568226
+3600,Kee Hong Food Stall,BL201149002,Kee Hiong Food Stall,Boon Lay Place Blk 221A/B (Boon Lay Place Market and Food Village),fuzzy,0.970,0.788,0.933,221A Boon Lay Place Singapore 641221
+2797,Geng Shu Mei Shi Shi Jia,TP30103002,Gen Shu Mei Shi Shi Jia,Toa Payoh Lorong 4 Blk 74 (Toa Payoh Vista Market),fuzzy,0.973,0.318,0.973,74 Toa Payoh Lorong 4 Singapore 310074
+3202,Hong Lim Prawn Noodles,UC10164003,Hong Lim Prawn Noodle,Upper Cross Street Blk 531A (Hong Lim Food Centre and Market),fuzzy,0.973,0.686,1.000,531A Upper Cross Street Singapore 051531
+3005,Delicious Duck Noodle,TTM023002,Delicious Duck Noodles,Tanglin Halt Market,fuzzy,0.974,0.488,1.000,48A Tanglin Halt Road Singapore 148813
+3144,Heng Heng Prawn Mee Soup,DUF0212003,Heg Heng prawn Mee Soup,Dunman Food Centre,fuzzy,0.974,0.375,0.957,271 Onan Road Singapore 424768
+2154,Sim Kee Duck Rice & Noodle,BN10153002,Sim Kee Duck Rice & Noodles,Bedok North Street 1 Blk 216,fuzzy,0.976,0.529,1.000,216 Bedok North Street 1 #01-01 Singapore 460216
+2473,Pondok Makan Indonesian,QS101123003,Pondok Makan Indonesia,Queen Street Blk 270 (Albert Centre),fuzzy,0.976,0.533,0.976,270 Queen Street Singapore 180270
+3652,Newton Mee Goreng Stall,NTF0164004,Newton Mee Goreong Stall,Newton Food Centre,fuzzy,0.976,0.636,0.960,500 Clemenceau Avenue North Singapore 229495
+2144,216 Pork Rib Prawn Noodle,BN10124003,216 Pork Ribs Prawn Noodle,Bedok North Street 1 Blk 216,fuzzy,0.977,0.611,0.952,216 Bedok North Street 1 #01-01 Singapore 460216
+1879,Fried Kway Yeow. Fried Prawn Mee. Fried Oyster. Carrot Cake,MWF053003,Fried Kway Teow . Fried Prawn Mee . Fried Oyster . Carrot Cake,Maxwell Food Centre (Kim Hua Market),fuzzy,0.979,0.451,0.974,1 Kadayanallur Street #01-01 Singapore 069184
+2023,168 Homemade Wanton Noodle,UB10158002,168 Homemade Wanton Noodles,Upper Boon Keng Road Blk 17 (Blk 17 Upper Boon Keng Market and Food Centre),fuzzy,0.979,0.455,1.000,17 Upper Boon Keng Road #01-01 Singapore 380017
+2009,Yong Seng Heng Prawn Noodles,CI20194003,Yong Sheng Heng Prawn Noodles,Circuit Road Blk 79/79A,fuzzy,0.980,0.533,0.960,79A Circuit Road #01-01 Singapore 371079
+2344,Simei Penang Laksa Speciality,JE101199003,Simei Penang Laksa Specialty,Jurong East Ave 1 Blk 347 (Yuhua Market and Hawker Centre),fuzzy,0.980,0.340,0.976,347 Jurong East Avenue 1 #01-171 Singapore 600347
+3594,Boon Lay Boneless Duck Noodles,BL201140003,Boon Lay Boneless Duck Noodle,Boon Lay Place Blk 221A/B (Boon Lay Place Market and Food Village),fuzzy,0.980,0.511,1.000,221A Boon Lay Place Singapore 641221
+2485,Ah Hua Teo Chew Fish Ball Noodle,WE20143005,Ah Hua Teo Chew fish ball noodles,West Coast Drive Blk 503 (Ayer Rajah Food Centre),fuzzy,0.981,0.489,1.000,503 West Coast Drive Singapore 120503
+2871,Dover Road Kai Kee Wanton Noodle,BM20109002,Dover Road Kai Kee Wanton Noodles,Bukit Merah Lane 1 Blk 120 (Alexandra Village Food Centre),fuzzy,0.982,0.609,1.000,120 Bukit Merah Lane 1 Singapore 150120
+2817,Slice Fish. Fish Head. Seafood Soup,CL401138003,Sliced Fish Fish Head Seafood Soup,Clementi West Street 2 Blk 726,fuzzy,0.982,0.588,0.982,726 Clementi West Street 2 Singapore 120726
+3199,Traditional Herbal Claypot Soups,UC10152004,Traditional Herbal Claypot Soup,Upper Cross Street Blk 531A (Hong Lim Food Centre and Market),fuzzy,0.982,0.522,0.982,531A Upper Cross Street Singapore 051531
+3329,Tian Cheng Fishball Noodle/Laksa,TB20120003,Tian Cheng Fishball Noodles Laksa,Telok Blangah Drive Blk 79 (Telok Blangah Food Centre),fuzzy,0.982,0.462,1.000,79 Telok Blangah Drive Singapore 100079
+3574,Tanglin Halt Traditional Snacks,HA20169003,Tangling Halt Traditional Snacks,Haig Road Blk 13/14 (Haig Road Market and Cooked Food Centre),fuzzy,0.982,0.423,0.982,14 Haig Road Singapore 430014
+3377,De Sheng Handmade Noodle/Fish Soup,HOM0119003,De Sheng Handmade Noodles/Fish Soup,Holland Village Market and Food Centre,fuzzy,0.983,0.449,1.000,1 Lorong Mambong Singapore 277700
+1958,He Sheng Hong Kong Flavour Expert Beef,BE10186002,He Sheng Hong Kong Flavor Expert Beef,Bendemeer Road Blk 29 (Bendemeer Market and Food Centre),fuzzy,0.984,0.469,0.984,29 Bendemeer Road #01-01 Singapore 330029
+3012,Seng Kee Mushroom Minced Meat Noodle,SGM037002,Seng Kee Mushroom Minced Meat Noodles,Serangoon Garden Market,fuzzy,0.984,0.656,1.000,49A Serangoon Garden Way Singapore 555945
+2434,Liang Chuan Fishball Minced Meat Noodle,CL30137002,Liang Chan Fishball Minced Meat Noodle,Clementi Ave 3 Blk 448,fuzzy,0.985,0.408,0.974,448 Clementi Avenue 3 Singapore 120448
+3699,Teochew St. Mushroom Minced Meat Noodle,SM102023003,Teochew St Mushroom Minced Meat Noodles,Smith Street Blk 335 (Chinatown Complex Market),fuzzy,0.985,0.548,1.000,335 Smith Street Singapore 050335
+1933,Fu Quan Mixed Vegetables Rice/ Bee Hoon /Mee,BE10103003,Fu Quan Mixed Vegetable Rice. Bee Hoon. Mee,Bendemeer Road Blk 29 (Bendemeer Market and Food Centre),fuzzy,0.986,0.645,0.984,29 Bendemeer Road #01-01 Singapore 330029
+2336,Chao Yang Teochew Porridge. Mixed Veg Rice,JE101173007,Chao Yang Teochew Porridge Mixed Vege Rice,Jurong East Ave 1 Blk 347 (Yuhua Market and Hawker Centre),fuzzy,0.986,0.444,0.976,347 Jurong East Avenue 1 #01-171 Singapore 600347
+3215,Hong Xing Handmade Fishball. Meatball Noodle,UC10230003,Hong Xin Handmade Fishball . Meatball Noodle,Upper Cross Street Blk 531A (Hong Lim Food Centre and Market),fuzzy,0.987,0.552,0.979,531A Upper Cross Street Singapore 051531
+2884,Xing Guang Vegetarian,BM20164006,Xing Guang Vegetarian,Bukit Merah Lane 1 Blk 120 (Alexandra Village Food Centre),exact,1.000,,,120 Bukit Merah Lane 1 Singapore 150120
+2638,Ci Wen Vegetarian Food,AMA0119002,CI WEN VEGETARIAN FOOD,Ang Mo Kio Street 22 Blk 226H (Kebun Baru Food Centre),exact,1.000,,,226H Ang Mo Kio Street 22 Singapore 568226
+2010,Lian Ji Shu Shi,UB10114002,Lian Ji Shu Shi,Upper Boon Keng Road Blk 17 (Blk 17 Upper Boon Keng Market and Food Centre),exact,1.000,,,17 Upper Boon Keng Road #01-01 Singapore 380017
+3044,Xin Mei Congee,AM90132003,Xin Mei Congee,Ang Mo Kio Ave 6 Blk 724 (Blk 724 Ang Mo Kio Market),exact,1.000,,,724 Ang Mo Kio Avenue 6 Singapore 560724
+3611,Hoe Ping Cook Food,AM80153003,Hoe Ping Cook Food,Ang Mo Kio Ave 4 Blk 628 (Ang Mo Kio 628 Market),exact,1.000,,,628 Ang Mo Kio Avenue 4 Singapore 560628
+1946,Very Nice Curry Rice,BE10159004,Very nice Curry Rice,Bendemeer Road Blk 29 (Bendemeer Market and Food Centre),exact,1.000,,,29 Bendemeer Road #01-01 Singapore 330029
+2480,Jurong Fong Yuen Minced Meat. Fish Ball Noodle,WE20117004,Jurong Fong Yuen Minced Meat Fishball Noodle,West Coast Drive Blk 503 (Ayer Rajah Food Centre),exact,1.000,,,503 West Coast Drive Singapore 120503
+3051,Hong Chong Wanton Noodle,AM90121003,Hong Chong Wanton Noodle,Ang Mo Kio Ave 6 Blk 724 (Blk 724 Ang Mo Kio Market),exact,1.000,,,724 Ang Mo Kio Avenue 6 Singapore 560724
+2897,Tom Yum Goong,PPF0142005,Tom yum goong,Pasir Panjang Food Centre,exact,1.000,,,121 Pasir Panjang Road Singapore 118543
+3047,Jia Jia,AM90136003,Jia Jia,Ang Mo Kio Ave 6 Blk 724 (Blk 724 Ang Mo Kio Market),exact,1.000,,,724 Ang Mo Kio Avenue 6 Singapore 560724
+2005,Chun Bai Wei,CI20183003,Chun Bai Wei,Circuit Road Blk 79/79A,exact,1.000,,,79A Circuit Road #01-01 Singapore 371079
+3043,Xi Xiang Feng,AM90123003,Xi Xiang Feng,Ang Mo Kio Ave 6 Blk 724 (Blk 724 Ang Mo Kio Market),exact,1.000,,,724 Ang Mo Kio Avenue 6 Singapore 560724
+2261,85 Bedok North Fried Oyster,HG30130003,85 Bedok North Fried Oyster,Hougang Street 21 Blk 209 (Kovan Hougang Market and Food Centre),exact,1.000,,,209 Hougang Street 21 #01-01 Singapore 530209
+2197,Ban Mian. Fish Soup,CV20182003,Ban Mian Fish Soup,Changi Village Blk 2 and 3,exact,1.000,,,2 Changi Village Road #01-01 Singapore 500002
+2704,Jia Le Handmade Fishball Noodle,CR10105004,Jia Le Handmade Fishball Noodle,Cambridge Road Blk 41A (Pek Kio Market and Food Centre),exact,1.000,,,41A Cambridge Road Singapore 211041
+2418,Hup Seng Huat Cooked Food,AM30122003,Hup Seng Huat Cooked Food,Ang Mo Kio Ave 10 Blk 409 (Teck Ghee Square),exact,1.000,,,409 Ang Mo Kio Avenue 10 Singapore 560409
+2170,Fatty Chui Big Prawn Noodle,NC101174003,FATTY CHUI BIG PRAWN NOODLE,New Upper Changi Road Blk 58,exact,1.000,,,58 New Upper Changi Road #01-148 Singapore 461058
+2172,Amy’s Laksa,NC101176003,Amy's Laksa,New Upper Changi Road Blk 58,exact,1.000,,,58 New Upper Changi Road #01-148 Singapore 461058
+3695,Gao Chu Jia Chang Fan,SM102009004,Gao Chu Jia Chang Fan,Smith Street Blk 335 (Chinatown Complex Market),exact,1.000,,,335 Smith Street Singapore 050335
+3370,Green Healthy Vegetarian,HO20240002,GREEN HEALTHY VEGETARIAN,Holland Drive Blk 44 (Holland Drive Market and Food Centre),exact,1.000,,,44 Holland Drive Singapore 270044
+2701,Sin Kee Nasi Lemak,CR10134004,Sin Kee Nasi Lemak,Cambridge Road Blk 41A (Pek Kio Market and Food Centre),exact,1.000,,,41A Cambridge Road Singapore 211041
+2178,Miao Xiang Vegetarian,NC101189002,Miao Xiang Vegetarian,New Upper Changi Road Blk 58,exact,1.000,,,58 New Upper Changi Road #01-148 Singapore 461058
+3441,Leng Huat Fishball Noodle. Laksa,TJF0289003,Leng Huat Fishball Noodle . Laksa,Taman Jurong Market and Food Centre,exact,1.000,,,3 Yung Sheng Road Singapore 618499
+3137,Long Fa,BR10116003,Long Fa,Bedok Reservoir Road Blk 630,exact,1.000,,,630 Bedok Reservoir Road Singapore 470630
+2193,Kun Kee,CV10147004,Kun Kee,Changi Village Blk 2 and 3,exact,1.000,,,2 Changi Village Road #01-01 Singapore 500002
+2632,Li Fa Ji,AMA0103004,Li Fa Ji,Ang Mo Kio Street 22 Blk 226H (Kebun Baru Food Centre),exact,1.000,,,226H Ang Mo Kio Street 22 Singapore 568226
+2477,Uncle Noodle,WE20104002,Uncle Noodle,West Coast Drive Blk 503 (Ayer Rajah Food Centre),exact,1.000,,,503 West Coast Drive Singapore 120503
+2857,BB Curry Rice,TB10189003,BB curry rice,Telok Blangah Crescent Blk 11 (11 Telok Blangah Crescent Market and Food Centre),exact,1.000,,,11 Telok Blangah Crescent  Singapore 090011
+2578,Hock Soon Carrot Cake,GM20129002,Hock Soon Carrot Cake,Ghim Moh Road Blk 20,exact,1.000,,,20 Ghim Moh Road Singapore 270020
+3675,Joy Garden,BN30186003,Joy Garden,Bedok North Street 3 Blk 538,exact,1.000,,,538 Bedok North Street 3 Singapore 460538
