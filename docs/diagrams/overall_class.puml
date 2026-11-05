@@ -1,0 +1,383 @@
+@startuml CleanCravings_OverallClassDiagram
+' SC2006 SCSL Group 4. One overall class diagram: boundary pages (bottom), control classes
+' (middle), entity classes (top), data sync (left) and start-up (bottom right).
+' Each feature's page, controller and <<use>> arrows share a colour.
+' Pages reach controllers through ApiClient (frontend/src/lib/api.ts) and the FastAPI routers;
+' the db session and "today" parameters are left out of the signatures for space.
+!pragma layout smetana
+title CleanCravings - Overall Class Diagram
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam classFontStyle bold
+skinparam classFontSize 12
+skinparam classAttributeFontSize 11
+skinparam ArrowColor #555555
+skinparam classBorderColor #333333
+skinparam noteBackgroundColor #FFFFFF
+hide circle
+hide empty members
+skinparam stereotypeFontSize 11
+
+' ---------------- Entities (backend/app/models.py) ----------------
+class User #7FD0F5 {
+  +id: String {Supabase uid}
+  +email: String
+  +display_name: String
+}
+class UserProfile #7FD0F5 {
+  +health_conditions: List
+  +dietary_restrictions: List
+  +dietary_preferences: List
+  +budget_min / budget_max
+  +hygiene_threshold: SafeGradeValue
+  +preferred_regions: List
+}
+class Favourite #7FD0F5 {
+  +target_type: CENTRE / STALL / DISH
+  +target_id: int
+  +date_saved: DateTime
+}
+class Visit #7FD0F5 {
+  +visit_date: Date
+  +rating: int [1..5]
+  +note: String
+}
+class ClosureAlert #7FD0F5 {
+  +message: String
+  +sent_timestamp: DateTime
+  +read_status: Boolean
+}
+class HawkerCentre #7FD0F5 {
+  +centre_name: String
+  +street_address / postal_code
+  +region: String
+  +latitude / longitude: float
+  +number_of_stalls: int
+}
+class Stall #7FD0F5 {
+  +stall_name: String
+  +unit_number: String
+  +stall_type: StallType
+  +halal: Boolean [0..1]
+}
+class Licensee #7FD0F5 {
+  +licence_number: String
+  +licence_status: String
+  +last_seen_snapshot: Date
+}
+class SAFEGrade #7FD0F5 {
+  +grade_value: A / B / C / NEW
+  +under_review: Boolean
+  +suspended_past_year: Boolean
+  +snapshot_date: Date
+}
+class ClosurePeriod #7FD0F5 {
+  +start_date / end_date: Date
+  +reason_type: ClosureReasonType
+  +is_active(today): Boolean
+}
+class ParticipatingStall #7FD0F5 {
+  +outlet_name: String
+  +participation_category: String
+  +match_method: exact / fuzzy / override
+}
+class DishType #7FD0F5 {
+  +dish_name: String
+  +energy_kcal / sodium_mg / sugar_g
+  +saturated_fat_g / protein_g
+  +contains_pork / contains_beef
+  +is_vegetarian: Boolean
+}
+class ClassificationRule #7FD0F5 {
+  +rule_id: String
+  +condition / nutrient
+  +operator / threshold
+  +verdict: Verdict
+  +citation: String
+}
+class SyncRun #7FD0F5 {
+  +source: NEA / SFA / HPB / REF
+  +status: running / ok / failed
+  +finished_at: DateTime
+  +is_sample: Boolean
+}
+
+User "1" *-- "0..1" UserProfile
+User "1" *-- "0..*" Favourite
+User "1" *-- "0..*" Visit
+User "1" *-- "0..*" ClosureAlert
+HawkerCentre "1" *-- "0..*" Stall
+HawkerCentre "1" *-- "0..*" ClosurePeriod
+Licensee "1" -- "1..*" Stall : operates
+Licensee "1" *-- "0..*" SAFEGrade
+Stall "0..1" -- "0..1" ParticipatingStall
+ClosureAlert "0..*" --> "1" ClosurePeriod
+Visit "0..*" --> "1" Stall
+
+' ---------------- Control (backend/app/controllers, rules, auth) ----------------
+class AuthenticationController <<Dependency Injection>> #E8636F {
+  +optional_user(authorization)
+  +require_user(user): User
+}
+class HawkerCentreController #F5A35C {
+  +list_centres(q, region, min_grade, origin, radius_km)
+  +centre_detail(centre_id, min_grade, halal_only)
+  +search(q)
+}
+class StallController #E68FB4 {
+  +stall_detail(stall_id)
+}
+class HygieneController #E68FB4 {
+  +GRADE_RANK: A > B > NEW > C
+  +current_grade(licensee)
+  +passes_threshold(stall, threshold): Boolean
+  +track_record(stall)
+}
+class ClosureController #66CDBF {
+  +centre_status(centre)
+  +closed_centre_ids(): Set
+  +generate_alerts(): int
+}
+class AlertController #66CDBF {
+  +list(user)
+  +mark_read(user, alert_id)
+}
+class HealthierEatingController #C8F08F {
+  +load_rules(): List<Rule>
+  +assess_dishes(conditions, restrictions, prefer_lower_sodium)
+}
+class Presenters <<Adapter>> #E5E7E9 {
+  controllers/presenters.py
+  --
+  +stall_summary(stall)
+  +centre_summary(centre, origin, hdp_count)
+  +confirmed_halal(stall): Boolean
+}
+class RuleEngine #C8F08F {
+  +evaluate(nutrients, rules, conditions): Assessment
+}
+class RecommendationController #8C8CF5 {
+  +recommend(user, origin, limit)
+}
+class UserProfileController #5DA5E8 {
+  +get(user)
+  +save(user, data)
+}
+class VisitController #5DA5E8 {
+  +add(user, data)
+  +list(user)
+}
+class FavouriteController #F7DC6F {
+  +list(user)
+  +add(user, data)
+  +remove(user, fav_id)
+}
+
+' ---------------- Boundary (frontend/src/pages) ----------------
+class SignInPage #E8636F {
+  +signInWithGoogle()
+  +continueAsGuest()
+}
+class FinderPage #F5A35C {
+  +searchCentres(q, region, minGrade, radius)
+  +showMap(centres)
+}
+class CentreDetailPage #F5A35C {
+  +showCentre(id, minGrade, halalOnly)
+  +openInMaps()
+}
+class StallDetailPage #E68FB4 {
+  +showStall(id)
+  +logVisit(rating, note, dish)
+}
+class AlertsPage #66CDBF {
+  +showAlerts()
+  +markRead(id)
+}
+class DishesPage #C8F08F {
+  +showDishes(conditions, restrictions)
+}
+class HomePage #8C8CF5 {
+  +showRecommendations(lat, lng)
+}
+class ProfilePage #5DA5E8 {
+  +showVisits()
+  +setTheme() / setTextSize()
+}
+class ProfileEditPage #5DA5E8 {
+  +saveProfile(profile)
+}
+class SavedPage #F7DC6F {
+  +showFavourites()
+}
+class AppShell #FFFFFF {
+  main.tsx routes + Layout tab bar
+}
+class ContextProviders <<Observer>> #FFFFFF {
+  AuthProvider: useAuth()
+  SettingsProvider: useSettings()
+  LocationProvider: useLocationCtx()
+  --
+  pages subscribe and re-render on change
+}
+class ApiClient <<Facade>> #FFFFFF {
+  frontend/src/lib/api.ts
+  --
+  +centres() / centre() / stall() / search()
+  +dishes() / recommendations()
+  +profile() / saveProfile() / favourites()
+  +visits() / alerts() / readAlert()
+  +setTokenGetter(fn)
+}
+
+' ---------------- Data sync (backend/etl) ----------------
+class RunAll #2E9E5B {
+  +main(): int  {daily, GitHub Actions}
+}
+class NEASync #2E9E5B {
+  +load(rows): int
+}
+class SFAImport #2E9E5B {
+  +load(rows, snapshot, suspended): int
+}
+class HPBPartnersSync #2E9E5B {
+  +match_outlets(outlets, centres, stalls, overrides)
+  +load(outlets, overrides)
+}
+class SeedReference #2E9E5B {
+  +load(): int
+}
+class SyncRunLogger <<Template Method>> #2E9E5B {
+  +sync_run(source): same steps around every load():
+  start run, commit or roll back, mark ok/failed
+}
+
+' ---------------- Start-up and database ----------------
+class App #7FD0F5 {
+  backend/app/main.py
+  --
+  +lifespan(): init_db()
+  +include_router(public, me)
+}
+class Database <<Factory>> #7FD0F5 {
+  backend/app/db.py
+  --
+  +make_engine(DATABASE_URL)
+  +init_db(): create tables + RLS
+}
+class Settings <<Singleton>> #7FD0F5 {
+  backend/app/config.py
+  --
+  +get_settings(): Settings  {@lru_cache}
+}
+interface "SQLAlchemy Engine" as Engine #7FD0F5
+class "SQLite (local dev)" as SQLiteImpl #7FD0F5
+class "PostgreSQL on Supabase" as PgImpl #7FD0F5
+
+' ---------------- Boundary -> Control (<<use>>) ----------------
+SignInPage .[#C0392B]up.> AuthenticationController : <<use>>
+FinderPage .[#E67E22]up.> HawkerCentreController : <<use>>
+CentreDetailPage .[#E67E22]up.> HawkerCentreController : <<use>>
+StallDetailPage .[#C2185B]up.> StallController : <<use>>
+StallDetailPage .[#C2185B]up.> VisitController : <<use>>
+AlertsPage .[#16A085]up.> AlertController : <<use>>
+DishesPage .[#7CB342]up.> HealthierEatingController : <<use>>
+HomePage .[#5B5BD6]up.> RecommendationController : <<use>>
+ProfileEditPage .[#2471A3]up.> UserProfileController : <<use>>
+ProfilePage .[#2471A3]up.> VisitController : <<use>>
+SavedPage .[#B7950B]up.> FavouriteController : <<use>>
+
+AppShell *-down- ContextProviders
+AppShell .down.> ApiClient : pages call the backend through
+AppShell o-up- SignInPage
+AppShell o-up- FinderPage
+AppShell o-up- CentreDetailPage
+AppShell o-up- StallDetailPage
+AppShell o-up- AlertsPage
+AppShell o-up- DishesPage
+AppShell o-up- HomePage
+AppShell o-up- ProfilePage
+AppShell o-up- ProfileEditPage
+AppShell o-up- SavedPage
+
+' ---------------- Control -> Control ----------------
+HawkerCentreController .[#E67E22].> HygieneController
+StallController .[#C2185B].> HygieneController
+RecommendationController .[#5B5BD6].> HygieneController
+RecommendationController .[#5B5BD6].> ClosureController
+HealthierEatingController .[#7CB342].> RuleEngine
+AlertController .[#16A085].> ClosureController
+HawkerCentreController .[#E67E22].> Presenters
+RecommendationController .[#5B5BD6].> Presenters
+Presenters .up.> Stall
+Presenters .up.> HawkerCentre
+
+' ---------------- Control -> Entity ----------------
+AuthenticationController .[#C0392B]up.> User
+HawkerCentreController .[#E67E22]up.> HawkerCentre
+HawkerCentreController .[#E67E22]up.> ParticipatingStall
+StallController .[#C2185B]up.> Stall
+HygieneController .[#C2185B]up.> Licensee
+HygieneController .[#C2185B]up.> SAFEGrade
+ClosureController .[#16A085]up.> ClosurePeriod
+ClosureController .[#16A085]up.> ClosureAlert
+AlertController .[#16A085]up.> ClosureAlert
+HealthierEatingController .[#7CB342]up.> DishType
+HealthierEatingController .[#7CB342]up.> ClassificationRule
+RecommendationController .[#5B5BD6]up.> UserProfile
+UserProfileController .[#2471A3]up.> UserProfile
+VisitController .[#2471A3]up.> Visit
+FavouriteController .[#B7950B]up.> Favourite
+
+' ---------------- Data sync -> Entity ----------------
+RunAll .[#1E7B45]up.> SeedReference
+RunAll .[#1E7B45]up.> NEASync
+RunAll .[#1E7B45]up.> SFAImport
+RunAll .[#1E7B45]up.> HPBPartnersSync
+RunAll .[#1E7B45]up.> ClosureController : generate_alerts()
+NEASync .[#1E7B45]up.> HawkerCentre
+NEASync .[#1E7B45]up.> ClosurePeriod
+SFAImport .[#1E7B45]up.> Licensee
+SFAImport .[#1E7B45]up.> SAFEGrade
+HPBPartnersSync .[#1E7B45]up.> ParticipatingStall
+SeedReference .[#1E7B45]up.> ClassificationRule
+SeedReference .[#1E7B45]up.> DishType
+SyncRunLogger .[#1E7B45]up.> SyncRun
+NEASync .[#1E7B45]up.> SyncRunLogger
+SFAImport .[#1E7B45]up.> SyncRunLogger
+HPBPartnersSync .[#1E7B45]up.> SyncRunLogger
+SeedReference .[#1E7B45]up.> SyncRunLogger
+
+' ---------------- Start-up ----------------
+App .up.> AppShell : serves API for
+App .right.> Database
+App ..> Settings
+Database ..> Settings
+Database .right.> Engine : <<create>>
+SQLiteImpl .up.|> Engine
+PgImpl .up.|> Engine
+
+note left of App
+  Start-up class: creates the tables and
+  enables row-level security, then mounts
+  the /api and /api/me routers.
+end note
+
+note bottom of ApiClient
+  The only HTTP client: every page reaches the
+  controllers through it and the FastAPI routers
+  /api (public) and /api/me (Google sign-in) (NFR-5).
+end note
+
+legend right
+  |= Design pattern |= Where |= What it does for us |
+  | Boundary-Control-Entity | whole system | pages, controllers and entities kept separate |
+  | Factory | Database.make_engine() | picks SQLite or PostgreSQL from DATABASE_URL |
+  | Singleton | Settings / get_settings() | one cached configuration object |
+  | Facade | ApiClient | one entry point hides HTTP, tokens and errors |
+  | Adapter | Presenters | turns entities into API response shapes |
+  | Observer | ContextProviders | pages update when sign-in, settings or location change |
+  | Template Method | SyncRunLogger.sync_run() | same logging and rollback around every data source |
+  | Dependency Injection | AuthenticationController | FastAPI Depends() injects the user and db session |
+endlegend
+@enduml
