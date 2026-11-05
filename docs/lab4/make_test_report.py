@@ -79,7 +79,7 @@ def build(rows: list[dict]) -> str:
 <tr><td>Lab group</td><td>SCSL, Group 4</td></tr>
 <tr><td>Team</td><td>CleanCravings</td></tr>
 <tr><td>Members</td><td>Rafael, Albin, Samrithi, Jovan, Jun Ren</td></tr>
-<tr><td>Author(s) of this document</td><td>[to fill in]</td></tr>
+<tr><td>Author(s) of this document</td><td>Rafael, Albin</td></tr>
 <tr><td>Test run</td><td>{date.today().isoformat()}, code at commit {e(commit())}: {passed} of {len(rows)} test cases passed</td></tr>
 </table>
 <h2>Contents</h2>
