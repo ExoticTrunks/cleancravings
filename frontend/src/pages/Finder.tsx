@@ -59,9 +59,10 @@ export default function Finder() {
   };
 
   const regions = useApi(() => api.regions(), []);
+  // Radius is applied below on distance_km, so moving the slider doesn't refetch
   const centres = useApi(
-    () => api.centres({ region, min_grade: minGrade, lat: place?.lat, lng: place?.lng, radius_km: place ? radius : null }),
-    [region, minGrade, place?.lat, place?.lng, radius],
+    () => api.centres({ region, min_grade: minGrade, lat: place?.lat, lng: place?.lng }),
+    [region, minGrade, place?.lat, place?.lng],
   );
 
   // Stall + dish search, debounced (FR-1.3)
@@ -77,9 +78,10 @@ export default function Finder() {
 
   const shown = useMemo(() => {
     const term = q.trim().toLowerCase();
-    const list = centres.data ?? [];
+    const inRadius = (c: { distance_km?: number | null }) => !place || !radius || c.distance_km == null || c.distance_km <= radius;
+    const list = (centres.data ?? []).filter(inRadius);
     return term ? list.filter((c) => `${c.centre_name} ${c.street_address ?? ''} ${c.postal_code ?? ''}`.toLowerCase().includes(term)) : list;
-  }, [centres.data, q]);
+  }, [centres.data, q, place, radius]);
 
   return (
     <div>

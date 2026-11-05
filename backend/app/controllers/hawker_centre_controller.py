@@ -6,9 +6,11 @@ from fastapi import HTTPException
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session, selectinload
 
+from ..geo import haversine_km
 from ..models import DishType, HawkerCentre, Licensee, ParticipatingStall, SafeGradeValue, Stall, StallType
 from ..schemas import CentreDetail, CentreSummary, ClosureOut, SearchOut, StallDetail, StallHit
-from .hygiene_controller import HygieneController
+from .cache import cached
+from .hygiene_controller import GRADE_RANK, HygieneController
 from .presenters import centre_summary, confirmed_halal, stall_summary
 
 
@@ -36,6 +38,24 @@ class HawkerCentreController:
         return {cid: n for cid, n in rows}
 
     @classmethod
+    def _cached_summaries(cls, db: Session, today: date) -> list[tuple[CentreSummary, int, str]]:
+        """Centre summaries without distance, plus the best current grade rank among each
+        centre's Cooked Food stalls and the text that search matches against. Cached (see
+        controllers/cache.py), so each request only works out distance (NFR-1)."""
+
+        def build() -> list[tuple[CentreSummary, int, str]]:
+            counts = cls.hdp_counts(db)
+            rows = []
+            for c in db.scalars(_centre_query()).all():
+                grades = (HygieneController.current_grade(s.licensee) for s in _cooked(c.stalls))
+                best_rank = max((GRADE_RANK[g.grade_value] for g in grades if g is not None), default=0)
+                haystack = f"{c.centre_name} {c.street_address or ''} {c.postal_code or ''}".lower()
+                rows.append((centre_summary(c, today, None, counts.get(c.id, 0)), best_rank, haystack))
+            return rows
+
+        return cached("centre_summaries", db, today, build)
+
+    @classmethod
     def list_centres(
         cls,
         db: Session,
@@ -46,21 +66,20 @@ class HawkerCentreController:
         origin: tuple[float, float] | None = None,
         radius_km: float | None = None,
     ) -> list[CentreSummary]:
-        centres = db.scalars(_centre_query()).all()
-        counts = cls.hdp_counts(db)
         out: list[CentreSummary] = []
         needle = (q or "").strip().lower()
-        for c in centres:
-            if region and c.region != region:
+        for base, best_rank, haystack in cls._cached_summaries(db, today):
+            if region and base.region != region:
                 continue
-            if needle and needle not in f"{c.centre_name} {c.street_address or ''} {c.postal_code or ''}".lower():
+            if needle and needle not in haystack:
                 continue
-            if min_grade and not any(HygieneController.passes_threshold(s, min_grade) for s in _cooked(c.stalls)):
+            # Same result as passes_threshold() on each Cooked Food stall (FR-2.5)
+            if min_grade and best_rank < GRADE_RANK[min_grade]:
                 continue
-            summary = centre_summary(c, today, origin, counts.get(c.id, 0))
-            if radius_km and summary.distance_km is not None and summary.distance_km > radius_km:
+            dist = round(haversine_km(origin[0], origin[1], base.latitude, base.longitude), 2) if origin else None
+            if radius_km and dist is not None and dist > radius_km:
                 continue
-            out.append(summary)
+            out.append(base.model_copy(update={"distance_km": dist}))
         # Name matches before address matches, then nearest first
         out.sort(
             key=lambda s: (

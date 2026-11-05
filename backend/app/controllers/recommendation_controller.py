@@ -4,6 +4,7 @@ The score is internal only. Per the data dictionary it's never shown as a number
 the client gets the ordered list plus plain-language reasons (contributing factors)."""
 
 from collections import defaultdict
+from dataclasses import dataclass
 from datetime import date, datetime, timezone
 
 from sqlalchemy import select
@@ -11,10 +12,11 @@ from sqlalchemy.orm import Session, selectinload
 
 from ..geo import haversine_km
 from ..models import Favourite, FavouriteTarget, HawkerCentre, Licensee, SafeGradeValue, Stall, StallType, User, UserProfile, Visit
-from ..schemas import RecommendationItem, RecommendationOut
+from ..schemas import CentreStatus, RecommendationItem, RecommendationOut, StallSummary
+from .cache import cached
 from .closure_controller import ClosureController
-from .hygiene_controller import HygieneController
-from .presenters import confirmed_halal, stall_summary, wants_halal
+from .hygiene_controller import GRADE_RANK
+from .presenters import stall_summary, wants_halal
 
 DISCLAIMER = (
     "Suggestions are ordered using official SFA, NEA and HPB data plus your preferences. "
@@ -23,6 +25,46 @@ DISCLAIMER = (
 GRADE_POINTS = {SafeGradeValue.A: 1.0, SafeGradeValue.B: 0.7, SafeGradeValue.NEW: 0.5, SafeGradeValue.C: 0.1}
 MAX_KM = 8.0
 PER_CENTRE_CAP = 3  # keep the list varied instead of 20 stalls from one centre
+
+
+@dataclass(frozen=True)
+class _CandidateCentre:
+    id: int
+    centre_name: str
+    region: str
+    latitude: float
+    longitude: float
+    status: CentreStatus
+    stalls: list[StallSummary]  # Cooked Food only (FR-1.6)
+
+
+def _candidate_centres(db: Session, today: date) -> list[_CandidateCentre]:
+    """Every centre with its status and stall summaries. The same for every user, so it's
+    cached (controllers/cache.py); only the user's own profile, bookmarks and ratings are
+    read per request (NFR-1)."""
+
+    def build() -> list[_CandidateCentre]:
+        centres = db.scalars(
+            select(HawkerCentre).options(
+                selectinload(HawkerCentre.closures),
+                selectinload(HawkerCentre.stalls).selectinload(Stall.licensee).selectinload(Licensee.grades),
+                selectinload(HawkerCentre.stalls).selectinload(Stall.hdp),
+            )
+        ).all()
+        return [
+            _CandidateCentre(
+                id=c.id,
+                centre_name=c.centre_name,
+                region=c.region,
+                latitude=c.latitude,
+                longitude=c.longitude,
+                status=ClosureController.centre_status(c, today),
+                stalls=[stall_summary(s) for s in c.stalls if s.stall_type == StallType.COOKED_FOOD],
+            )
+            for c in centres
+        ]
+
+    return cached("recommendation_centres", db, today, build)
 
 
 class RecommendationController:
@@ -49,44 +91,36 @@ class RecommendationController:
             for v in db.scalars(select(Visit).where(Visit.user_id == user.id, Visit.rating.is_not(None)).order_by(Visit.visit_date)):
                 ratings[v.stall_id] = v.rating  # latest rating wins
 
-        centres = db.scalars(
-            select(HawkerCentre).options(
-                selectinload(HawkerCentre.closures),
-                selectinload(HawkerCentre.stalls).selectinload(Stall.licensee).selectinload(Licensee.grades),
-                selectinload(HawkerCentre.stalls).selectinload(Stall.hdp),
-            )
-        ).all()
-
         scored: list[tuple[float, RecommendationItem]] = []
         excluded_closed = excluded_hygiene = excluded_halal = halal_confirmed = total = 0
-        for c in centres:
-            status = ClosureController.centre_status(c, today)
-            cooked = [s for s in c.stalls if s.stall_type == StallType.COOKED_FOOD]
-            total += len(cooked)
+        for c in _candidate_centres(db, today):
+            status = c.status
+            total += len(c.stalls)
             if status.state in ("closed", "not_operating"):
-                excluded_closed += len(cooked)  # FR-3.3
+                excluded_closed += len(c.stalls)  # FR-3.3
                 continue
             dist = haversine_km(origin[0], origin[1], c.latitude, c.longitude) if origin else None
             if dist is not None and dist > MAX_KM:
                 continue
-            for s in cooked:
-                if not HygieneController.passes_threshold(s, threshold):
+            for s in c.stalls:
+                grade = s.safe_grade.grade_value if s.safe_grade else None
+                # Same rule as HygieneController.passes_threshold: no current grade fails any minimum
+                if threshold and (grade is None or GRADE_RANK[grade] < GRADE_RANK[threshold]):
                     excluded_hygiene += 1
                     continue
                 if halal_only:
-                    if not confirmed_halal(s):
+                    if s.halal is not True:  # as presenters.confirmed_halal: None means unknown
                         excluded_halal += 1
                         continue
                     halal_confirmed += 1
-                grade = HygieneController.current_grade(s.licensee)
                 score, reasons = 0.0, []
                 if dist is not None:
                     score += 3 * max(0.0, 1 - dist / MAX_KM)
                     reasons.append(f"{dist:.1f} km away")
-                score += 2 * (GRADE_POINTS[grade.grade_value] if grade else 0.3)
-                if grade and grade.grade_value == SafeGradeValue.A:
+                score += 2 * (GRADE_POINTS[grade] if grade else 0.3)
+                if grade == SafeGradeValue.A:
                     reasons.append("SAFE Grade A")
-                if s.hdp is not None:
+                if s.hdp_participant:
                     score += 2 if wants_healthier else 0.5
                     reasons.append("Healthier Dining Programme stall")
                 if c.region in regions:
@@ -105,7 +139,7 @@ class RecommendationController:
                     (
                         score,
                         RecommendationItem(
-                            stall=stall_summary(s),
+                            stall=s,
                             centre_name=c.centre_name,
                             centre_region=c.region,
                             distance_km=round(dist, 2) if dist is not None else None,
