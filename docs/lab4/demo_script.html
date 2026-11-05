@@ -1,0 +1,259 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Lab 4 Demo Script</title>
+<style>
+@page { size: A4; margin: 16mm 15mm; @bottom-right { content: "Page " counter(page); font: 9pt Arial, sans-serif; color: #555; }
+  @bottom-left { content: "SC2006 SCSL Group 4 | CleanCravings demo script"; font: 9pt Arial, sans-serif; color: #555; } }
+body { font: 10pt/1.45 Arial, Helvetica, sans-serif; color: #111; }
+h1 { font-size: 24pt; margin: 6px 0 16px; } h2 { font-size: 14.5pt; margin: 18px 0 6px; border-bottom: 1.5px solid #222; padding-bottom: 2px; }
+h3 { font-size: 11.5pt; margin: 12px 0 4px; } p { margin: 5px 0; } ul, ol { margin: 4px 0; padding-left: 20px; } li { margin: 2px 0; }
+.cover { padding-top: 38mm; } .course { font-size: 13pt; color: #444; margin: 0; }
+.meta { border-collapse: collapse; margin: 10px 0 22px; } .meta td { padding: 4px 14px 4px 0; vertical-align: top; } .meta td:first-child { font-weight: bold; }
+table.t { border-collapse: collapse; width: 100%; margin: 6px 0 10px; font-size: 8.8pt; }
+table.t th, table.t td { border: 1px solid #888; padding: 3px 5px; vertical-align: top; text-align: left; }
+table.t th { background: #dcecf7; } table.t tr { break-inside: avoid; }
+td.n { white-space: nowrap; font-weight: bold; } .say { font-style: italic; color: #1d3c5c; }
+.req { font-size: 8pt; color: #555; white-space: nowrap; }
+.note { background: #fff6e0; border-left: 3px solid #d99a00; padding: 5px 9px; margin: 8px 0; font-size: 9.2pt; }
+code { font: 8.6pt Consolas, monospace; background: #f2f2f2; padding: 0 2px; }
+.pb { break-before: page; }
+</style></head><body>
+
+<section class="cover">
+<p class="course">SC2006 Software Engineering</p>
+<h1>Lab 4 Deliverables: Demo Script</h1>
+<table class="meta">
+<tr><td>Lab group</td><td>SCSL, Group 4</td></tr>
+<tr><td>Product</td><td>CleanCravings: find clean, nearby hawker stalls and dishes that suit your health</td></tr>
+<tr><td>Members</td><td>Rafael, Albin, Samrithi, Jovan, Jun Ren</td></tr>
+<tr><td>Author(s) of this document</td><td>Rafael, Jovan, Jun Ren</td></tr>
+<tr><td>Used for</td><td>The Lab 5 live demo (about 20 minutes) and the 5-minute demo video (section 7)</td></tr>
+</table>
+<h2>Contents</h2>
+<ol>
+<li>Plan and roles</li>
+<li>Before the demo</li>
+<li>Live demo run sheet (13 to 15 minutes)</li>
+<li>SE practices, design and traceability (5 minutes)</li>
+<li>If something goes wrong</li>
+<li>What not to demo or claim</li>
+<li>5-minute demo video script</li>
+</ol>
+</section>
+
+<section class="pb">
+<h2>1. Plan and roles</h2>
+<p>We present CleanCravings as a prototype to a client choosing which product to invest in: show that it meets the
+client's requirements, that it is built on real government data, and that its design can grow. The demo follows the
+<b>scenarios of two end users</b>, a guest who has not signed in and a signed-in diner with a health condition, then
+covers SE practices and traceability with slides.</p>
+<table class="t">
+<tr><th style="width:9%">Part</th><th style="width:45%">Content</th><th style="width:12%">Time</th><th>Who</th></tr>
+<tr><td class="n">0</td><td>Opening: the problem and the use case diagram</td><td>1:30</td><td>Narrator</td></tr>
+<tr><td class="n">A</td><td>Guest journey: find a clean centre and stall, check dishes</td><td>4:30</td><td>Driver + narrator</td></tr>
+<tr><td class="n">B</td><td>Signed-in journey: health profile, tailored picks, dish ratings, bookmarks and closure alerts, visit log</td><td>5:30</td><td>Driver + narrator</td></tr>
+<tr><td class="n">C</td><td>Accessibility, mobile and data trust</td><td>1:30</td><td>Driver + narrator</td></tr>
+<tr><td class="n">D</td><td>SE practices and system design (slides 2 to 4)</td><td>2:30</td><td>[presenter]</td></tr>
+<tr><td class="n">E</td><td>Traceability for UC-3.0 and UC-6.0, shown in the IDE (slides 5 to 7)</td><td>2:30</td><td>[presenter]</td></tr>
+<tr><td class="n">F</td><td>Close and questions</td><td>1:00</td><td>All</td></tr>
+<tr><td></td><td><b>Total</b></td><td><b>about 19:00</b></td><td></td></tr>
+</table>
+<p><b>Driver</b>: at the laptop, clicks only what the run sheet says. <b>Narrator</b>: speaks the lines in
+<span class="say">italics</span> (a guide, not a script to read word for word). Assign the roles and the parts D and E
+presenters before rehearsal.</p>
+
+<h2>2. Before the demo</h2>
+<h3>The day before</h3>
+<ul>
+<li>Run the full data sync so the app shows live data, not the "Sample data" banner: in <code>backend/</code>,
+<code>python -m etl.run_all</code> (drop the latest SFA export into <code>etl/inbox/</code> first if you have one).</li>
+<li>Check the Supabase project is active (free projects pause after a week without use) and open it once.</li>
+<li>Rehearse the whole run sheet with a timer at least once, on the demo laptop.</li>
+<li>Prepare the <b>demo account</b>: a Google account the team can use on stage. Sign in once and leave its health profile
+<b>empty</b>, so part B can show the profile setup. Delete its old bookmarks and visits if it was used in rehearsal.</li>
+<li>Prepare a <b>backup browser profile</b> that is already signed in with a completed profile (see section 5).</li>
+<li>Have the slides (<i>CleanCravings: SE Practices &amp; Traceability</i>) and the IDE ready, with these files open in tabs:
+<code>hygiene_controller.py</code>, <code>badges.tsx</code>, <code>classification_rules.csv</code>, <code>rules/engine.py</code>,
+<code>healthier_eating_controller.py</code>, <code>labels.ts</code>, <code>tests/test_lab4.py</code>.</li>
+</ul>
+<h3>One hour before</h3>
+<ul>
+<li>Start the backend (<code>uvicorn app.main:app</code>) and the frontend (<code>npm run dev</code>). Wait about 15 seconds
+for the backend to warm its caches.</li>
+<li>Open Home, Finder &amp; Map, Dishes and three or four centre pages once, so centre photos and map tiles are cached.</li>
+<li>In Finder &amp; Map, note one centre whose card shows an orange <b>"Closes in N days"</b> pill (for step B5) and one
+stall with a <b>NEW</b> grade (for step A7). They change over time, so pick them on the day.</li>
+<li>Turn off notifications; set the browser zoom so text is readable from the back of the room; close other tabs.</li>
+</ul>
+<h3>Five minutes before</h3>
+<ul>
+<li>Sign out of the demo account, open <code>http://localhost:5173</code>, light theme, normal text size.</li>
+<li>Have the use case diagram (<code>lab3/1_use_case_model</code>) open for the opening.</li>
+</ul>
+</section>
+
+<section class="pb">
+<h2>3. Live demo run sheet</h2>
+<div class="note">Times are cumulative. Requirement IDs (FR, NFR, UC) are listed so the narrator can name them; mentioning a
+few is enough.</div>
+
+<h3>Part 0: Opening (0:00 to 1:30)</h3>
+<table class="t">
+<tr><th>#</th><th style="width:21%">Screen and action</th><th>What to say</th><th>Shows</th></tr>
+<tr><td class="n">0.1</td><td>Title slide or the app's Home page</td><td class="say">Hawker food is where most of Singapore eats. But
+when you choose a stall you can't easily see how clean it is, whether the centre is closed for cleaning this week, or
+whether a dish suits your blood pressure. CleanCravings brings the official answers together: SFA hygiene grades, NEA
+closure dates and HPB's Healthier Dining Programme.</td><td class="req">Problem</td></tr>
+<tr><td class="n">0.2</td><td>Use case diagram</td><td class="say">Our main actor is the diner, as a guest or signed in. Guests can browse
+everything; signing in adds a health profile, bookmarks, closure alerts and a visit log. The external actors are our data
+sources and Google sign-in. Let's start as a guest.</td><td class="req">UC model</td></tr>
+</table>
+
+<h3>Part A: Guest journey (1:30 to 6:00)</h3>
+<table class="t">
+<tr><th>#</th><th style="width:21%">Screen and action</th><th>What to say</th><th>Shows</th></tr>
+<tr><td class="n">A1</td><td><b>For you</b> (Home). In the location bar type a postal code (e.g. <code>639798</code>, NTU) and press <b>Go</b></td>
+<td class="say">Without signing in, I get clean, nearby picks: stalls from centres that are open today, ordered by SAFE grade
+and distance. The note at the bottom says how many stalls we hid because their centre is closed today, and that these are
+suggestions, not guarantees.</td><td class="req">FR-5.6, FR-3.3, NFR-6</td></tr>
+<tr><td class="n">A2</td><td><b>Finder &amp; Map</b>. Point at the list of 123 centres with photos and grade counts</td>
+<td class="say">Here are all 123 NEA hawker centres. Each card shows the centre's photo, today's status, how many stalls have
+each SAFE grade, and how many are in the Healthier Dining Programme.</td><td class="req">FR-1.1, FR-2.1</td></tr>
+<tr><td class="n">A3</td><td>Set <b>Region</b> to a region, <b>Hygiene</b> to "A or B", then use <b>Use my location</b> or the postal
+code and drag the <b>Within … km</b> slider</td><td class="say">I can filter by region and by a minimum hygiene grade, and limit
+the distance. The list updates instantly as I drag, because it filters in the browser instead of asking the server
+again.</td><td class="req">FR-1.4, FR-2.5</td></tr>
+<tr><td class="n">A4</td><td>Switch to <b>Map</b>, then back to <b>List</b>. Type a dish such as <code>laksa</code> in the search box</td>
+<td class="say">The same results on a map, using OneMap, Singapore's official base map. Search also finds stalls and dishes, not
+just centres.</td><td class="req">FR-1.2, FR-1.3</td></tr>
+<tr><td class="n">A5</td><td>Open a centre. Point at the photo, status pill and stall list. Change <b>Any grade</b> to "A only", tick
+<b>Healthier Dining only</b>, then untick it</td><td class="say">A centre page: NEA's photo, its status, upcoming cleaning closures,
+and every cooked-food stall with its SAFE grade. I can narrow it to grade A only, or to Healthier Dining stalls. Open in
+Maps hands over to Google Maps or OneMap for directions.</td><td class="req">FR-1.5, FR-1.6, FR-3.1, FR-4.1</td></tr>
+<tr><td class="n">A6</td><td>Tick <b>Confirmed halal only</b> and read the note</td><td class="say">Halal works differently: we only show
+stalls whose halal status is published by HPB. A hidden stall hasn't published a status; we never assume it isn't
+halal.</td><td class="req">FR-5.1, NFR-6</td></tr>
+<tr><td class="n">A7</td><td>Open a stall. Point at the grade badge and its explanation, <b>Grade history</b> and the source line</td>
+<td class="say">The stall page explains the grade in plain words, shows its history from SFA's records, whether the licence was
+suspended in the past year, and where and when the data came from. NEW is shown differently from C: it means the stall is
+new, not that it failed.</td><td class="req">FR-2.1 to FR-2.4, NFR-2, NFR-4</td></tr>
+<tr><td class="n">A8</td><td><b>Dishes</b>. Scroll the groups; open one dish card</td><td class="say">Common hawker dishes rated against HPB
+guidance. Each rating says why: which rule fired, with its source. The wording is deliberately soft: "Have occasionally",
+never "unhealthy". Photos are freely licensed and credited.</td><td class="req">UC-6.0, NFR-6</td></tr>
+</table>
+
+<h3>Part B: Signed-in journey (6:00 to 11:30)</h3>
+<table class="t">
+<tr><th>#</th><th style="width:21%">Screen and action</th><th>What to say</th><th>Shows</th></tr>
+<tr><td class="n">B1</td><td><b>Sign in</b> → <b>Continue with Google</b> with the demo account</td><td class="say">Now as a signed-in diner.
+Sign-in is Google only, so we never store passwords.</td><td class="req">FR-0.1, FR-0.2, NFR-8</td></tr>
+<tr><td class="n">B2</td><td>Health profile setup: tick <b>High blood pressure</b>, preference <b>Lower sodium first</b>, minimum SAFE
+grade <b>A or B</b>, one preferred region. Save</td><td class="say">The profile is optional and can be changed any time. Our diner
+has high blood pressure and only wants grade A or B stalls.</td><td class="req">UC-1.0, FR-5.1 to FR-5.5</td></tr>
+<tr><td class="n">B3</td><td><b>For you</b> again. Point at the reason chips and the note at the bottom</td><td class="say">The picks now
+follow the profile: each stall says why it's here, for example the distance or the preferred region, and the note shows
+how many stalls the hygiene threshold hid.</td><td class="req">FR-5.4, FR-5.6</td></tr>
+<tr><td class="n">B4</td><td><b>Dishes</b>. Find a dish rated "Have occasionally" and open it. Then tick <b>Diabetes</b> at the top and
+untick it</td><td class="say">With high blood pressure, high-sodium dishes move down; the card shows the exact rule and threshold.
+Conditions can be tried live. If we're missing a nutrient value, the app says "Not enough data" instead of
+guessing.</td><td class="req">UC-6.0, NFR-6</td></tr>
+<tr><td class="n">B5</td><td>Open the centre noted earlier with <b>"Closes in N days"</b> and press <b>Save</b>. Open <b>Alerts</b> (bell)</td>
+<td class="say">Saving a centre also subscribes me to its closures. This one closes within a week, so the alert appears straight
+away; the daily sync creates new ones as NEA announces dates.</td><td class="req">UC-7.0, UC-8.0, FR-3.4</td></tr>
+<tr><td class="n">B6</td><td><b>Saved</b></td><td class="say">Bookmarked centres, stalls and dishes in one place.</td><td class="req">FR-5.7</td></tr>
+<tr><td class="n">B7</td><td>Open a stall → <b>Log a visit</b>: 5 stars, choose a dish, short note, <b>Save visit</b>. Then
+<b>Profile</b> → <b>Visit history</b></td><td class="say">I can log what I ate and rate it. It stays private to me, and stalls I rate
+highly get a small boost in my picks.</td><td class="req">UC-4.0, FR-5.8, FR-5.9</td></tr>
+</table>
+
+<h3>Part C: Accessibility, mobile and data trust (11:30 to 13:00)</h3>
+<table class="t">
+<tr><th>#</th><th style="width:21%">Screen and action</th><th>What to say</th><th>Shows</th></tr>
+<tr><td class="n">C1</td><td><b>Profile</b> → <b>Accessibility</b>: Theme <b>dark</b>, then a larger <b>Text size</b>. Open Finder &amp; Map
+on the map</td><td class="say">Dark mode and larger text, available to guests too; the map switches to OneMap's night tiles.</td>
+<td class="req">UC-10.0</td></tr>
+<tr><td class="n">C2</td><td>Browser developer tools → device toolbar (or a real phone), Home page</td><td class="say">It's one responsive
+web app, so it works on Android and iPhone browsers without an app store.</td><td class="req">NFR-11</td></tr>
+<tr><td class="n">C3</td><td>Point at a "Source: … last updated" line on a stall page</td><td class="say">Every piece of data comes from
+an official source, through our own server, with a last-updated date. If a source is down, we keep showing the last good
+data with a warning instead of breaking.</td><td class="req">NFR-2, NFR-5, NFR-9</td></tr>
+</table>
+<p>Switch back to light theme and normal text size before part D.</p>
+</section>
+
+<section class="pb">
+<h2>4. SE practices, design and traceability (13:00 to 18:00)</h2>
+<p>Use the slide deck <i>CleanCravings: SE Practices &amp; Traceability</i>; its speaker notes have the full talking points.</p>
+<table class="t">
+<tr><th style="width:9%">Slide</th><th style="width:30%">Topic</th><th>Key points</th><th style="width:9%">Time</th></tr>
+<tr><td class="n">2</td><td>System design at a glance</td><td>Boundary (React pages, FastAPI routers) → control (controllers) → entity (models,
+Supabase Postgres). Data sync runs nightly outside the request path; a failed run keeps the last good data.</td><td>0:50</td></tr>
+<tr><td class="n">3</td><td>SE practices we applied</td><td>Layered design; rules as data; independent data sync; typed API contract;
+automated tests and CI on every push; secure by default (Google sign-in, row-level security).</td><td>1:00</td></tr>
+<tr><td class="n">4</td><td>Ready for the next version</td><td>New health condition = rows in a CSV; new data source = one sync module;
+native app = new client on the same API; push notifications; PostGIS if we outgrow simple distance.</td><td>0:40</td></tr>
+<tr><td class="n">5</td><td>Traceability: UC-3.0 hygiene grades</td><td>FR-2.1, 2.2, 2.5 → UC-3.0 → HygieneController in the class diagram →
+<code>GRADE_RANK</code> and <code>passes_threshold()</code> in the IDE → <code>GradeBadge</code> → Lab 4 black-box tests. Run
+<code>pytest tests/test_lab4.py -k blackbox</code> live.</td><td>1:15</td></tr>
+<tr><td class="n">6</td><td>Traceability: UC-6.0 dish recommendation</td><td>FR-5.6, NFR-6 → UC-6.0 → HealthierEatingController → one row of
+<code>classification_rules.csv</code> → <code>evaluate()</code> → <code>labels.ts</code> wording → generated boundary tests and the
+Lab 4 basis path tests. Run <code>pytest tests/test_rules.py -q</code> live.</td><td>1:15</td></tr>
+<tr><td class="n">7</td><td>Closing slide</td><td>Requirements, design, code and tests stay linked.</td><td>0:10</td></tr>
+</table>
+
+<h2>5. If something goes wrong</h2>
+<table class="t">
+<tr><th style="width:30%">Problem</th><th>What to do</th></tr>
+<tr><td>Google sign-in fails or is slow</td><td>Switch to the backup browser profile that is already signed in, and continue from B3
+(say the profile was set up earlier).</td></tr>
+<tr><td>A page shows "Request failed" or loads very slowly</td><td>The backend has stopped or Supabase is unreachable. Check the
+backend terminal; restart it. If Supabase is down, set <code>DATABASE_URL=sqlite:///./cleancravings.db</code> in
+<code>backend/.env</code> (a local copy of the real data) and restart; sign in with the dev sign-in.</td></tr>
+<tr><td>"Use my location" is blocked</td><td>Type the postal code instead.</td></tr>
+<tr><td>No centre is closing within 7 days</td><td>Skip the live alert in B5; show the <b>Alerts</b> page of the backup profile, or explain
+the rule using a centre's <b>Upcoming closures</b>.</td></tr>
+<tr><td>No internet at all</td><td>Play the recorded demo video (section 7) and do parts D and E from the slides and IDE.</td></tr>
+</table>
+
+<h2>6. What not to demo or claim</h2>
+<ul>
+<li><b>Not built yet</b> (say they're planned if asked): in-app routing (UC-2.1; we hand over to Google Maps or OneMap), the weekly
+health digest (UC-4.1), exporting a health summary (UC-4.2), stall-to-dish reports (UC-9.0), public ratings and comments
+(UC-11.0; visit ratings are private), voice search.</li>
+<li><b>Data no open dataset provides</b>: operating hours, prices, a stall's own dishes, SFA demerit points (the stall page says
+"not published"). Don't suggest we have them.</li>
+<li><b>Health claims</b>: say "suits your profile" or "within HPB guidance", never "healthy" or "safe to eat". Ratings are for
+typical recipes, not a particular stall.</li>
+<li><b>Hygiene</b>: a SAFE grade is SFA's assessment of a licensee's track record, not a guarantee.</li>
+</ul>
+</section>
+
+<section class="pb">
+<h2>7. 5-minute demo video script</h2>
+<p>Screen recording with voice-over (for example OBS or the Windows Snipping Tool's recorder), 1080p, with the app in
+light theme. Record each scene separately and join them, so a mistake only costs one scene. Same preparation as section 2.</p>
+<table class="t">
+<tr><th style="width:11%">Time</th><th style="width:30%">On screen</th><th>Voice-over</th></tr>
+<tr><td class="n">0:00–0:25</td><td>Title, then Home page</td><td class="say">This is CleanCravings, by SCSL Group 4. It helps you find clean, nearby
+hawker stalls and dishes that suit your health, using official data from SFA, NEA and HPB.</td></tr>
+<tr><td class="n">0:25–1:15</td><td>Finder &amp; Map: list with photos, Hygiene "A or B", distance slider, map view, search "laksa"</td>
+<td class="say">All 123 hawker centres, with today's status and their stalls' SAFE grades. Filter by region, minimum grade and
+distance, see them on OneMap, or search for a stall or dish.</td></tr>
+<tr><td class="n">1:15–2:00</td><td>A centre page, then a stall page: grade, grade history, source line</td><td class="say">Each centre lists its
+cooked-food stalls with their grades, Healthier Dining partners and upcoming closures. A stall shows its SAFE grade
+explained in plain words, its history, and where the data comes from. NEW means new, not failing.</td></tr>
+<tr><td class="n">2:00–2:40</td><td>Sign in with Google, health profile: high blood pressure, "A or B", preferred region</td><td class="say">Signing
+in lets you set a health profile: conditions, dietary restrictions, a minimum hygiene grade and preferred regions.</td></tr>
+<tr><td class="n">2:40–3:30</td><td>For you with reason chips; Dishes: open a "Have occasionally" dish, toggle Diabetes</td><td class="say">Picks now
+follow your profile and explain why each stall is there. Dishes are rated against HPB guidance for your conditions,
+showing the exact rule and its source, in careful wording. Missing data is labelled, never guessed.</td></tr>
+<tr><td class="n">3:30–4:10</td><td>Save a centre that closes soon → Alerts; Log a visit → Visit history</td><td class="say">Save a centre to get
+alerts when it closes for cleaning or repairs, and log your visits to keep a private food diary that also improves your
+picks.</td></tr>
+<tr><td class="n">4:10–4:40</td><td>Dark mode, larger text, phone-sized view</td><td class="say">It's accessible, with dark mode and larger text,
+and works in any phone browser.</td></tr>
+<tr><td class="n">4:40–5:00</td><td>Architecture slide, then the test run passing</td><td class="say">Behind it: a layered FastAPI and React
+design, nightly syncs from official sources, health rules stored as data, and over a hundred automated tests on every
+change. CleanCravings: eat well, eat safe.</td></tr>
+</table>
+</section>
+</body></html>
