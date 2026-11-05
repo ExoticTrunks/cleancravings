@@ -1,0 +1,34 @@
+@startuml CFG_centre_status
+' SC2006 Lab 4 white-box testing: control flow graph of
+' backend/app/controllers/closure_controller.py ClosureController.centre_status().
+' Node numbers match the basis paths in backend/tests/test_lab4.py (STATUS_CASES).
+title Control Flow Graph: centre_status(centre, today)
+skinparam shadowing false
+skinparam ActivityBackgroundColor #7FD0F5
+skinparam ActivityDiamondBackgroundColor #7FD0F5
+skinparam ActivityBorderColor #333333
+skinparam ArrowColor #333333
+
+start
+:**1** centre_status(centre, today);
+if (**2** nea_status set and not "Existing"?) then (True)
+  :**3** return status "not_operating";
+else (False)
+  :**4** active = first closure with start <= today <= end
+  upcoming = first closure starting after today
+  days_to_next = days until upcoming starts;
+  if (**5** active closure today?) then (True)
+    :**6** state = "closed";
+  else (False)
+    if (**7** upcoming closure\nwithin 7 days?) then (True)
+      :**8** state = "closing_soon";
+    else (False)
+      :**9** state = "open";
+    endif
+  endif
+  :**10** return status (state, closures,
+  days_to_next, reopens_on);
+endif
+:**11** end;
+stop
+@enduml

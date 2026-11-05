@@ -1,0 +1,42 @@
+@startuml CFG_evaluate
+' SC2006 Lab 4 white-box testing: control flow graph of backend/app/rules/engine.py evaluate().
+' Node numbers match the basis paths in backend/tests/test_lab4.py (ENGINE_CASES).
+title Control Flow Graph: evaluate(nutrients, rules, conditions)
+skinparam shadowing false
+skinparam ActivityBackgroundColor #7FD0F5
+skinparam ActivityDiamondBackgroundColor #7FD0F5
+skinparam ActivityBorderColor #333333
+skinparam ArrowColor #333333
+
+start
+:**1** wanted = GENERAL + user's conditions
+applicable = rules for those conditions
+findings, missing, checked = empty; worst = None;
+while (**2** another applicable rule r?) is (True)
+  if (**3** dish has no value for r.nutrient?) then (True)
+    :**4** add r.nutrient to missing;
+  else (False)
+    if (**5** mark r.condition checked;\ndoes r fire (value operator threshold)?) then (True)
+      if (**6** add finding;\nworst is None or r.verdict is worse?) then (True)
+        :**7** worst = r.verdict;
+      else (False)
+      endif
+    else (False)
+    endif
+  endif
+endwhile (False)
+while (**8** unchecked = conditions with rules − checked;\nanother missing nutrient n?) is (True)
+  :**9** add "No n value yet" finding;
+endwhile (False)
+if (**10** worst = AVOID?) then (True)
+  :**11** verdict = AVOID;
+else (False)
+  if (**12** a condition unchecked\nor no rule fired?) then (True)
+    :**13** verdict = INSUFFICIENT_DATA;
+  else (False)
+    :**14** verdict = worst;
+  endif
+endif
+:**15** sort findings, return Assessment;
+stop
+@enduml
