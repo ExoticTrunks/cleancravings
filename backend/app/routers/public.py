@@ -3,7 +3,7 @@
 from datetime import datetime, timedelta, timezone
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -99,6 +99,16 @@ def centre_detail(
     if halal_only is None:
         halal_only = wants_halal(db.get(UserProfile, user.id) if user else None)
     return HawkerCentreController.centre_detail(db, centre_id, today_sg(), min_grade, halal_only)
+
+
+@router.get(
+    "/centres/{centre_id}/photo",
+    response_class=Response,
+    responses={200: {"content": {"image/jpeg": {}}, "description": "The centre's photo from NEA"}, 404: {}, 502: {}},
+)
+def centre_photo(centre_id: int, db: Session = Depends(get_db)):
+    data, ctype = HawkerCentreController.photo(db, centre_id)
+    return Response(data, media_type=ctype, headers={"Cache-Control": "public, max-age=86400"})
 
 
 @router.get("/stalls/{stall_id}", response_model=StallDetail)

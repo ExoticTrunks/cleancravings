@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { GradeBadge, StatusPill } from '../components/badges';
+import { CentrePhoto } from '../components/CentrePhoto';
 import { ErrorBox, Loading, LocationBar, PageHeader } from '../components/common';
 import Icon from '../components/Icon';
 import MapView from '../components/MapView';
@@ -16,6 +17,7 @@ function CentreCard({ c }: { c: CentreSummary }) {
   return (
     <Link to={`/centres/${c.id}`} className="card block p-4 transition hover:border-brand-500">
       <div className="flex items-start gap-3">
+        <CentrePhoto key={c.id} id={c.id} hasPhoto={!!c.photo_url} className="size-16" />
         <div className="min-w-0 flex-1">
           <h3 className="font-semibold leading-snug">{c.centre_name}</h3>
           <p className="truncate text-sm text-stone-500">

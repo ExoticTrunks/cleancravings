@@ -2,6 +2,7 @@
 import { Link } from 'react-router-dom';
 import { ErrorBox, FreshnessBanner, Loading, LocationBar } from '../components/common';
 import { VerdictBadge } from '../components/badges';
+import { DishThumb } from '../components/DishPhoto';
 import StallRow from '../components/StallRow';
 import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
@@ -90,7 +91,10 @@ export default function Home() {
           </div>
           {dishes.data?.dishes.slice(0, 5).map((d) => (
             <div key={d.id} className="flex items-center justify-between gap-2 border-t border-stone-100 py-2 text-sm first:border-0 dark:border-stone-800">
-              <span className="truncate">{d.dish_name}</span>
+              <span className="flex min-w-0 items-center gap-2">
+                <DishThumb name={d.dish_name} className="size-9" />
+                <span className="truncate">{d.dish_name}</span>
+              </span>
               <VerdictBadge verdict={d.verdict} />
             </div>
           ))}

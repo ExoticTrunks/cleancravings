@@ -81,6 +81,8 @@ Dish verdicts come from `etl/data/classification_rules.csv` (`condition, nutrien
 
 `src/lib/api.ts` is the only HTTP client; its types are aliases into `src/api/schema.d.ts`, generated from the backend's OpenAPI schema. **After changing a backend schema or endpoint, run the backend and `npm run gen:api`**, otherwise the frontend types drift (and the build catches renamed fields). Data fetching in pages uses the `useApi(fn, deps)` hook. App-wide state is in context providers in `src/lib/` (`SettingsProvider`, `AuthProvider`, `LocationProvider`); routes are declared in `src/main.tsx`. The frontend must only talk to our FastAPI backend, never directly to data.gov.sg/SFA/HPB (NFR-5); even geocoding goes through `/api/geocode`. Map is Leaflet with OneMap tiles (Night tiles in dark mode).
 
+Photos: centre photos come from NEA's `photourl` (stored as `hawker_centre.photo_url`) and reach the browser only through `GET /api/centres/{id}/photo` (`HawkerCentreController.photo`), which fetches from nea.gov.sg only and caches in memory; the frontend uses `photo_url` just to know a photo exists. Dish photos are free-licence Wikimedia Commons images committed in `frontend/public/dishes/`, keyed by exact `dish_name` in `src/lib/dishPhotos.ts`, so renaming a dish in `dish_types.csv` needs the same change there; the credit each licence requires is shown by `DishPhotoCredit`.
+
 TypeScript config is a team decision: `strict: false` but `strictNullChecks: true` and `noUnusedLocals: true`. Don't turn on other strict flags.
 
 ### Tests

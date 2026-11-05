@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import BookmarkButton from '../components/BookmarkButton';
 import { VerdictBadge } from '../components/badges';
 import { ErrorBox, Loading, PageHeader } from '../components/common';
+import { DishPhotoCredit, DishThumb } from '../components/DishPhoto';
 import Icon from '../components/Icon';
 import { api, type DishAssessment, type Verdict } from '../lib/api';
 import { useAuth } from '../lib/auth';
@@ -25,7 +26,8 @@ function DishCard({ d, open, onToggle }: { d: DishAssessment; open: boolean; onT
   return (
     <div className="card p-3" id={`dish-${d.id}`}>
       <div className="flex items-center gap-2">
-        <button className="flex min-w-0 flex-1 items-center gap-2 text-left" onClick={onToggle} aria-expanded={open}>
+        <button className="flex min-w-0 flex-1 items-center gap-3 text-left" onClick={onToggle} aria-expanded={open}>
+          <DishThumb name={d.dish_name} className="size-14" />
           <span className="min-w-0 flex-1">
             <span className="block truncate font-medium">{d.dish_name}</span>
             <span className="text-xs text-stone-500">
@@ -41,7 +43,8 @@ function DishCard({ d, open, onToggle }: { d: DishAssessment; open: boolean; onT
       </div>
       {open && (
         <div className="mt-3 border-t border-stone-100 pt-3 text-sm dark:border-stone-800">
-          <dl className="grid grid-cols-3 gap-2 sm:grid-cols-5">
+          <DishPhotoCredit name={d.dish_name} />
+          <dl className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5">
             {Object.entries(n).map(([k, v]) => (
               <div key={k}>
                 <dt className="text-xs text-stone-500">{NUTRIENT_LABEL[k]}</dt>

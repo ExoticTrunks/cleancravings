@@ -279,6 +279,50 @@
     }
    }
   },
+  "/api/centres/{centre_id}/photo": {
+   "get": {
+    "tags": [
+     "public"
+    ],
+    "summary": "Centre Photo",
+    "operationId": "centre_photo_api_centres__centre_id__photo_get",
+    "parameters": [
+     {
+      "name": "centre_id",
+      "in": "path",
+      "required": true,
+      "schema": {
+       "type": "integer",
+       "title": "Centre Id"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "description": "The centre's photo from NEA",
+      "content": {
+       "image/jpeg": {}
+      }
+     },
+     "404": {
+      "description": "Not Found"
+     },
+     "502": {
+      "description": "Bad Gateway"
+     },
+     "422": {
+      "description": "Validation Error",
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      }
+     }
+    }
+   }
+  },
   "/api/stalls/{stall_id}": {
    "get": {
     "tags": [

@@ -81,6 +81,8 @@ export const api = {
   freshness: () => request<Freshness>('GET', '/meta/freshness'),
   regions: () => request<string[]>('GET', '/regions'),
   centres: (q: Query = {}) => request<CentreSummary[]>('GET', '/centres', { query: q }),
+  // An <img> src, not a request: the backend fetches NEA's photo so the browser never calls NEA (NFR-5)
+  centrePhotoUrl: (id: number) => `${BASE}/api/centres/${id}/photo`,
   // halalOnly null/undefined: the backend follows the signed-in user's HALAL restriction
   centre: (id: number, minGrade?: SafeGrade | null, halalOnly?: boolean | null) =>
     request<CentreDetail>('GET', `/centres/${id}`, { query: { min_grade: minGrade, halal_only: halalOnly } }),

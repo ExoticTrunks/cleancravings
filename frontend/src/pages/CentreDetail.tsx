@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import BookmarkButton from '../components/BookmarkButton';
 import { StatusPill } from '../components/badges';
+import { CentrePhoto } from '../components/CentrePhoto';
 import { ErrorBox, Loading, PageHeader } from '../components/common';
 import Icon from '../components/Icon';
 import MapView from '../components/MapView';
@@ -74,6 +75,13 @@ export default function CentreDetail() {
         </section>
 
         <aside className="min-w-0 space-y-4">
+          {/* In the sidebar, NEA's photos (about 600 px wide) show near their real size instead of blurring */}
+          {c.photo_url && (
+            <figure>
+              <CentrePhoto key={c.id} id={c.id} alt={c.centre_name} className="h-48 w-full" hideIfMissing />
+              <figcaption className="mt-1 text-xs text-stone-500">Photo: NEA</figcaption>
+            </figure>
+          )}
           <MapView centres={[c]} place={null} selectedId={c.id} className="h-56" />
           <div className="grid grid-cols-2 gap-2">
             <a className="btn-ghost text-sm" href={`https://www.google.com/maps/dir/?api=1&destination=${c.latitude},${c.longitude}`} target="_blank" rel="noreferrer">

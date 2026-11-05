@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { StatusPill } from '../components/badges';
 import { invalidateFavourites } from '../components/BookmarkButton';
 import { ErrorBox, Loading, LoginPrompt, PageHeader } from '../components/common';
+import { CentrePhoto } from '../components/CentrePhoto';
+import { DishThumb } from '../components/DishPhoto';
 import Icon from '../components/Icon';
 import { api, type ProfileIn, type SafeGrade } from '../lib/api';
 import { useAuth } from '../lib/auth';
@@ -194,6 +196,8 @@ export function Saved() {
             <ul className="space-y-2">
               {items.map((f) => (
                 <li key={f.id} className="card flex items-center gap-3 p-3">
+                  {g.type === 'DISH' && <DishThumb name={f.label} className="size-11" />}
+                  {g.type === 'CENTRE' && !f.unavailable && <CentrePhoto key={f.target_id} id={f.target_id} className="size-11" />}
                   <Link to={f.unavailable ? '#' : g.type === 'DISH' ? `/dishes?focus=${encodeURIComponent(f.label)}` : g.link(f.target_id)} className="min-w-0 flex-1">
                     <p className="truncate font-medium">{f.label}</p>
                     <p className="text-sm text-stone-500">{f.unavailable ? 'Unavailable: no longer in the official list' : f.subtitle}</p>

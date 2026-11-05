@@ -1,3 +1,6 @@
+import httpx
+import pytest
+
 from tests.conftest import AUTH
 
 
@@ -138,3 +141,42 @@ def test_halal_restriction_in_profile(client):
 def test_search(client):
     j = client.get("/api/search", params={"q": "maxwell"}).json()
     assert j["centres"][0]["centre_name"] == "Maxwell Food Centre"
+
+
+def test_centre_photo_missing_is_404(client):
+    # The sample NEA rows have no photourl
+    assert client.get("/api/centres/1/photo").status_code == 404
+
+
+def test_centre_photo_is_proxied_from_nea_and_cached(client, monkeypatch):
+    from app.controllers import hawker_centre_controller as hcc
+
+    calls = []
+
+    class FakeResponse:
+        status_code = 200
+        headers = {"content-type": "image/jpeg"}
+        content = b"\xff\xd8fake-jpeg"
+        url = httpx.URL("https://www.nea.gov.sg/images/x.jpg")
+
+    def fake_get(url, **kw):
+        calls.append(url)
+        return FakeResponse()
+
+    monkeypatch.setattr(hcc, "_photo_source", lambda db, cid: "http://www.nea.gov.sg/images/x.jpg")
+    monkeypatch.setattr(hcc.httpx, "get", fake_get)
+    monkeypatch.setattr(hcc, "_photos", {})
+    for _ in range(2):
+        r = client.get("/api/centres/2/photo")
+        assert r.status_code == 200 and r.content == FakeResponse.content
+        assert r.headers["content-type"] == "image/jpeg"
+    assert calls == ["https://www.nea.gov.sg/images/x.jpg"]  # upgraded to https, fetched once (NFR-5)
+
+
+def test_centre_photo_only_fetches_from_nea(client, monkeypatch):
+    from app.controllers import hawker_centre_controller as hcc
+
+    monkeypatch.setattr(hcc, "_photo_source", lambda db, cid: "https://evil.example.com/x.jpg")
+    monkeypatch.setattr(hcc.httpx, "get", lambda *a, **k: pytest.fail("must not fetch a non-NEA URL"))
+    monkeypatch.setattr(hcc, "_photos", {})
+    assert client.get("/api/centres/3/photo").status_code == 404

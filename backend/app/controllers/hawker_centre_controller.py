@@ -1,7 +1,9 @@
 """HawkerCentreController (FR-1.1 to FR-1.4, FR-2.5) and StallController (FR-1.5 to FR-1.7)."""
 
 from datetime import date
+from urllib.parse import urlsplit
 
+import httpx
 from fastapi import HTTPException
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session, selectinload
@@ -12,6 +14,14 @@ from ..schemas import CentreDetail, CentreSummary, ClosureOut, SearchOut, StallD
 from .cache import cached
 from .hygiene_controller import GRADE_RANK, HygieneController
 from .presenters import centre_summary, confirmed_halal, stall_summary
+
+# Centre photos fetched from NEA, per process: {centre_id: (bytes, content type)}
+_photos: dict[int, tuple[bytes, str]] = {}
+PHOTO_HOSTS = ("nea.gov.sg", "www.nea.gov.sg")
+
+
+def _photo_source(db: Session, centre_id: int) -> str | None:
+    return db.scalar(select(HawkerCentre.photo_url).where(HawkerCentre.id == centre_id))
 
 
 def _centre_query():
@@ -36,6 +46,29 @@ class HawkerCentreController:
             .group_by(ParticipatingStall.centre_id)
         )
         return {cid: n for cid, n in rows}
+
+    @staticmethod
+    def photo(db: Session, centre_id: int) -> tuple[bytes, str]:
+        """The centre's photo from NEA's hawker centre dataset (photo_url), fetched by the server
+        so the browser only ever talks to our API (NFR-5). Only that centre's own URL is fetched,
+        and only from nea.gov.sg; each photo is downloaded once per process."""
+        if centre_id in _photos:
+            return _photos[centre_id]
+        url = _photo_source(db, centre_id)
+        if not url:
+            raise HTTPException(404, "No photo for this centre")
+        url = url.replace("http://", "https://", 1)  # NEA's older links are plain http
+        if urlsplit(url).hostname not in PHOTO_HOSTS:
+            raise HTTPException(404, "No photo for this centre")
+        try:
+            r = httpx.get(url, timeout=15, follow_redirects=True, headers={"User-Agent": "CleanCravings/0.2"})
+        except httpx.HTTPError:
+            raise HTTPException(502, "NEA photo unavailable") from None
+        ctype = r.headers.get("content-type", "")
+        if r.status_code != 200 or not ctype.startswith("image/") or r.url.host not in PHOTO_HOSTS:
+            raise HTTPException(502, "NEA photo unavailable")
+        _photos[centre_id] = (r.content, ctype)
+        return _photos[centre_id]
 
     @classmethod
     def _cached_summaries(cls, db: Session, today: date) -> list[tuple[CentreSummary, int, str]]:
