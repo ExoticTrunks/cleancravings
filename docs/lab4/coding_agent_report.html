@@ -137,7 +137,7 @@ export would behave differently, and said to add a test for that first.</p>
 <li><b>One rule instead of three.</b> Our minimum-grade rule (FR-2.5) was written out in three places: <code>passes_threshold</code>,
 the cached centre list and the recommendations. The halal check and the suspension flag were each written twice. It added
 <code>HygieneController.grade_passes()</code> and <code>suspended_past_year()</code> and made every caller use them.</li>
-<li><b>It caught an error in our own documentation.</b> Our Lab 4 test document says the centre list and recommendations use
+<li><b>It caught an error in our own documentation.</b> Our Lab 4 test document said the centre list and recommendations use
 <code>passes_threshold()</code>. They had kept their own copies of the rule since we added caching, so our 16 black-box tests only
 covered one of the three copies.</li>
 <li><b>It named a remaining gap.</b> No test checks which centres the minimum-grade filter returns.</li>
@@ -147,9 +147,9 @@ covered one of the three copies.</li>
 <p>This met and in places exceeded our expectations. The review was specific to our code rather than generic advice, the ranking
 was reasonable, and the refactoring was small, safe and easy to check. Its "proof" that behaviour was unchanged was careful
 reasoning, not a test run, since it could not run commands; we confirmed it with the test suite and the real-data comparison.
-The most valuable result was finding the mismatch between our test document and our code, which a human review had missed. Adopting
-this refactoring would make the rule our black-box tests cover the one every list uses, and the missing centre-list test
-would close the gap it found. Its suggestions 3 and 5 are medium risk, and we would only attempt them with new tests in place first, as it
+The most valuable result was finding the mismatch between our test document and our code, which a human review had missed. We
+adopted this refactoring, so the rule our black-box tests cover is now the one every list uses; the missing centre-list test
+would close the remaining gap it found. Its suggestions 3 and 5 are medium risk, and we would only attempt them with new tests in place first, as it
 advised.</p>
 </section>
 

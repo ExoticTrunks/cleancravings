@@ -24,7 +24,7 @@ td.pass { color: #126b2a; font-weight: bold; } td.fail { color: #b00020; font-we
 <tr><td>Team</td><td>CleanCravings</td></tr>
 <tr><td>Members</td><td>Rafael, Albin, Samrithi, Jovan, Jun Ren</td></tr>
 <tr><td>Author(s) of this document</td><td>Rafael, Albin, Samrithi</td></tr>
-<tr><td>Test run</td><td>2026-11-05, code at commit da0a0d3: 34 of 34 test cases passed</td></tr>
+<tr><td>Test run</td><td>2026-11-10, code at commit 0737ea1: 34 of 34 test cases passed</td></tr>
 </table>
 <h2>Contents</h2>
 <ol class="toc">
@@ -43,8 +43,9 @@ td.pass { color: #126b2a; font-weight: bold; } td.fail { color: #b00020; font-we
 <p><b>HygieneController</b> (<code>backend/app/controllers/hygiene_controller.py</code>) holds the food-hygiene logic
 (FR-2.1 to FR-2.5). It works out a stall's current SAFE grade from the dated snapshots imported from SFA, builds its
 track record, and decides whether a stall meets a user's <i>Hygiene Threshold</i>: the minimum SAFE grade the user
-wants to see. That decision, <code>passes_threshold(stall, threshold)</code>, is used by the centre list filter, the
-centre page's stall list and the recommendations (FR-2.5, FR-5.4), so it decides which stalls a user is shown.</p>
+wants to see. <code>passes_threshold(stall, threshold)</code> makes that decision for a stall using the rule in
+<code>grade_passes()</code>, and the centre list filter, the centre page's stall list and the recommendations all use that one
+rule (FR-2.5, FR-5.4), so it decides which stalls a user is shown.</p>
 <p>The rules it implements:</p>
 <ul>
 <li>Grades are ordered <b>A &gt; B &gt; NEW &gt; C</b>. NEW (a stall licensed less than a year) ranks above C,
