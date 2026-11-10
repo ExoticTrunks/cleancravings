@@ -82,6 +82,13 @@ def read_rows(path: Path) -> list[dict]:
 
 def load(db: Session, rows: list[dict], snapshot: date, suspended: set[str] = frozenset()) -> int:
     centres = centres_by_postal(db)
+    # Loaded once instead of three queries per row: looking up about 5,600 hawker rows one by one
+    # took over 20 minutes against the hosted database, long enough for the connection to drop
+    licensees = {x.licence_number: x for x in db.scalars(select(Licensee))}
+    stalls: dict[str, Stall] = {}
+    for s in db.scalars(select(Stall)):
+        stalls.setdefault(s.licence_number, s)
+    grades = {x.licence_number: x for x in db.scalars(select(SAFEGrade).where(SAFEGrade.snapshot_date == snapshot))}
     n = 0
     for r in rows:
         address = clean(r.get("establishmentaddress"))
@@ -93,14 +100,16 @@ def load(db: Session, rows: list[dict], snapshot: date, suspended: set[str] = fr
         lic_no = clean(r["licencenumber"]).upper()
         grade = parse_grade(r.get("grade"))
 
-        lic = db.get(Licensee, lic_no) or Licensee(licence_number=lic_no)
+        lic = licensees.get(lic_no) or Licensee(licence_number=lic_no)
+        licensees[lic_no] = lic
         lic.licensee_name = clean(r.get("licenseename"))
         lic.licence_status = "suspended" if lic_no in suspended else "active"
         if lic.last_seen_snapshot is None or snapshot >= lic.last_seen_snapshot:
             lic.last_seen_snapshot = snapshot
         db.add(lic)
 
-        stall = db.scalars(select(Stall).where(Stall.licence_number == lic_no)).first() or Stall(licence_number=lic_no)
+        stall = stalls.get(lic_no) or Stall(licence_number=lic_no)
+        stalls[lic_no] = stall
         stall.centre_id = centre.id
         stall.stall_name = clean(r.get("businessname")) or clean(r.get("licenseename")) or lic_no
         stall.unit_number = unit_number(address)
@@ -108,9 +117,8 @@ def load(db: Session, rows: list[dict], snapshot: date, suspended: set[str] = fr
         db.add(stall)
 
         if grade:
-            g = db.scalars(
-                select(SAFEGrade).where(SAFEGrade.licence_number == lic_no, SAFEGrade.snapshot_date == snapshot)
-            ).first() or SAFEGrade(licence_number=lic_no, snapshot_date=snapshot)
+            g = grades.get(lic_no) or SAFEGrade(licence_number=lic_no, snapshot_date=snapshot)
+            grades[lic_no] = g
             g.grade_value, g.under_review = grade
             g.suspended_past_year = lic_no in suspended
             db.add(g)
