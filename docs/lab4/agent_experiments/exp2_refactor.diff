@@ -1,0 +1,138 @@
+diff -u -x __pycache__ original/backend/app/controllers/hawker_centre_controller.py refactored/backend/app/controllers/hawker_centre_controller.py
+--- original/backend/app/controllers/hawker_centre_controller.py	2026-11-05 23:34:55.000000000 +0800
++++ refactored/backend/app/controllers/hawker_centre_controller.py	2026-11-05 23:47:13.468803000 +0800
+@@ -71,19 +71,19 @@
+         return _photos[centre_id]
+ 
+     @classmethod
+-    def _cached_summaries(cls, db: Session, today: date) -> list[tuple[CentreSummary, int, str]]:
+-        """Centre summaries without distance, plus the best current grade rank among each
++    def _cached_summaries(cls, db: Session, today: date) -> list[tuple[CentreSummary, SafeGradeValue | None, str]]:
++        """Centre summaries without distance, plus the best current grade among each
+         centre's Cooked Food stalls and the text that search matches against. Cached (see
+         controllers/cache.py), so each request only works out distance (NFR-1)."""
+ 
+-        def build() -> list[tuple[CentreSummary, int, str]]:
++        def build() -> list[tuple[CentreSummary, SafeGradeValue | None, str]]:
+             counts = cls.hdp_counts(db)
+             rows = []
+             for c in db.scalars(_centre_query()).all():
+                 grades = (HygieneController.current_grade(s.licensee) for s in _cooked(c.stalls))
+-                best_rank = max((GRADE_RANK[g.grade_value] for g in grades if g is not None), default=0)
++                best = max((g.grade_value for g in grades if g is not None), key=GRADE_RANK.__getitem__, default=None)
+                 haystack = f"{c.centre_name} {c.street_address or ''} {c.postal_code or ''}".lower()
+-                rows.append((centre_summary(c, today, None, counts.get(c.id, 0)), best_rank, haystack))
++                rows.append((centre_summary(c, today, None, counts.get(c.id, 0)), best, haystack))
+             return rows
+ 
+         return cached("centre_summaries", db, today, build)
+@@ -101,13 +101,14 @@
+     ) -> list[CentreSummary]:
+         out: list[CentreSummary] = []
+         needle = (q or "").strip().lower()
+-        for base, best_rank, haystack in cls._cached_summaries(db, today):
++        for base, best_grade, haystack in cls._cached_summaries(db, today):
+             if region and base.region != region:
+                 continue
+             if needle and needle not in haystack:
+                 continue
+-            # Same result as passes_threshold() on each Cooked Food stall (FR-2.5)
+-            if min_grade and best_rank < GRADE_RANK[min_grade]:
++            # A centre is listed if at least one Cooked Food stall meets the minimum (FR-2.5),
++            # i.e. if its best one does
++            if not HygieneController.grade_passes(best_grade, min_grade):
+                 continue
+             dist = round(haversine_km(origin[0], origin[1], base.latitude, base.longitude), 2) if origin else None
+             if radius_km and dist is not None and dist > radius_km:
+diff -u -x __pycache__ original/backend/app/controllers/hygiene_controller.py refactored/backend/app/controllers/hygiene_controller.py
+--- original/backend/app/controllers/hygiene_controller.py	2026-11-05 23:34:55.000000000 +0800
++++ refactored/backend/app/controllers/hygiene_controller.py	2026-11-05 23:46:57.758932800 +0800
+@@ -20,14 +20,26 @@
+             return None  # latest SFA export had no SAFE grade for this licence
+         return latest
+ 
++    @staticmethod
++    def grade_passes(grade: SafeGradeValue | None, threshold: SafeGradeValue | None) -> bool:
++        """The Hygiene Threshold rule (FR-2.5) on a grade value. Every list that filters by a
++        minimum grade (centre list, centre page, recommendations) goes through this."""
++        if threshold is None:
++            return True
++        if grade is None:
++            return False  # can't show an ungraded stall to someone who set a minimum
++        return GRADE_RANK[grade] >= GRADE_RANK[threshold]
++
+     @classmethod
+     def passes_threshold(cls, stall: Stall, threshold: SafeGradeValue | None) -> bool:
+         if threshold is None:
+             return True
+         g = cls.current_grade(stall.licensee)
+-        if g is None:
+-            return False  # can't show an ungraded stall to someone who set a minimum
+-        return GRADE_RANK[g.grade_value] >= GRADE_RANK[threshold]
++        return cls.grade_passes(g.grade_value if g else None, threshold)
++
++    @staticmethod
++    def suspended_past_year(licensee: Licensee | None) -> bool:
++        return bool(licensee and licensee.licence_status == "suspended")
+ 
+     @classmethod
+     def summary(cls, stalls: Iterable[Stall]) -> GradeSummary:
+@@ -49,7 +61,7 @@
+             if not changes or changes[-1].grade_value != g.grade_value:
+                 changes.append(g)
+         return TrackRecordOut(
+-            suspended_past_year=bool(stall.licensee and stall.licensee.licence_status == "suspended"),
++            suspended_past_year=cls.suspended_past_year(stall.licensee),
+             grade_history=[SafeGradeOut.model_validate(g) for g in reversed(changes)],
+             last_updated=stall.licensee.last_seen_snapshot if stall.licensee else None,
+         )
+diff -u -x __pycache__ original/backend/app/controllers/presenters.py refactored/backend/app/controllers/presenters.py
+--- original/backend/app/controllers/presenters.py	2026-11-05 23:34:55.000000000 +0800
++++ refactored/backend/app/controllers/presenters.py	2026-11-05 23:47:02.808633300 +0800
+@@ -19,7 +19,7 @@
+         cuisine=stall.cuisine,
+         price_range=stall.price_range,
+         safe_grade=SafeGradeOut.model_validate(g) if g else None,
+-        suspended_past_year=bool(stall.licensee and stall.licensee.licence_status == "suspended"),
++        suspended_past_year=HygieneController.suspended_past_year(stall.licensee),
+         hdp_participant=stall.hdp is not None,
+         hdp_category=stall.hdp.participation_category if stall.hdp else None,
+         hdp_match_method=stall.hdp.match_method if stall.hdp else None,
+@@ -31,7 +31,7 @@
+     return bool(profile and "HALAL" in (profile.dietary_restrictions or []))
+ 
+ 
+-def confirmed_halal(stall: Stall) -> bool:
++def confirmed_halal(stall: Stall | StallSummary) -> bool:
+     # Only an explicit True counts. None means the stall hasn't published it, not that it's non-halal
+     return stall.halal is True
+ 
+diff -u -x __pycache__ original/backend/app/controllers/recommendation_controller.py refactored/backend/app/controllers/recommendation_controller.py
+--- original/backend/app/controllers/recommendation_controller.py	2026-11-05 23:34:55.000000000 +0800
++++ refactored/backend/app/controllers/recommendation_controller.py	2026-11-05 23:47:19.727499600 +0800
+@@ -15,8 +15,8 @@
+ from ..schemas import CentreStatus, RecommendationItem, RecommendationOut, StallSummary
+ from .cache import cached
+ from .closure_controller import ClosureController
+-from .hygiene_controller import GRADE_RANK
+-from .presenters import stall_summary, wants_halal
++from .hygiene_controller import HygieneController
++from .presenters import confirmed_halal, stall_summary, wants_halal
+ 
+ DISCLAIMER = (
+     "Suggestions are ordered using official SFA, NEA and HPB data plus your preferences. "
+@@ -104,12 +104,11 @@
+                 continue
+             for s in c.stalls:
+                 grade = s.safe_grade.grade_value if s.safe_grade else None
+-                # Same rule as HygieneController.passes_threshold: no current grade fails any minimum
+-                if threshold and (grade is None or GRADE_RANK[grade] < GRADE_RANK[threshold]):
++                if not HygieneController.grade_passes(grade, threshold):
+                     excluded_hygiene += 1
+                     continue
+                 if halal_only:
+-                    if s.halal is not True:  # as presenters.confirmed_halal: None means unknown
++                    if not confirmed_halal(s):
+                         excluded_halal += 1
+                         continue
+                     halal_confirmed += 1

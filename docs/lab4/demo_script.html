@@ -48,18 +48,19 @@ client's requirements, that it is built on real government data, and that its de
 covers SE practices and traceability with slides.</p>
 <table class="t">
 <tr><th style="width:9%">Part</th><th style="width:45%">Content</th><th style="width:12%">Time</th><th>Who</th></tr>
-<tr><td class="n">0</td><td>Opening: the problem and the use case diagram</td><td>1:30</td><td>Narrator</td></tr>
-<tr><td class="n">A</td><td>Guest journey: find a clean centre and stall, check dishes</td><td>4:30</td><td>Driver + narrator</td></tr>
-<tr><td class="n">B</td><td>Signed-in journey: health profile, tailored picks, dish ratings, bookmarks and closure alerts, visit log</td><td>5:30</td><td>Driver + narrator</td></tr>
-<tr><td class="n">C</td><td>Accessibility, mobile and data trust</td><td>1:30</td><td>Driver + narrator</td></tr>
-<tr><td class="n">D</td><td>SE practices and system design (slides 2 to 4)</td><td>2:30</td><td>[presenter]</td></tr>
-<tr><td class="n">E</td><td>Traceability for UC-3.0 and UC-6.0, shown in the IDE (slides 5 to 7)</td><td>2:30</td><td>[presenter]</td></tr>
+<tr><td class="n">0</td><td>Opening: the problem and the use case diagram</td><td>1:30</td><td>Samrithi</td></tr>
+<tr><td class="n">A</td><td>Guest journey: find a clean centre and stall, check dishes</td><td>4:30</td><td>Rafael</td></tr>
+<tr><td class="n">B</td><td>Signed-in journey: health profile, tailored picks, dish ratings, bookmarks and closure alerts, visit log</td><td>5:30</td><td>Rafael</td></tr>
+<tr><td class="n">C</td><td>Accessibility, mobile and data trust</td><td>1:30</td><td>Rafael</td></tr>
+<tr><td class="n">D</td><td>System design and SE practices (slides 2 and 3)</td><td>1:50</td><td>Albin</td></tr>
+<tr><td class="n">D/E</td><td>Future upgrades and traceability for UC-3.0, shown in the IDE (slides 4 and 5)</td><td>1:55</td><td>Jovan</td></tr>
+<tr><td class="n">E</td><td>Traceability for UC-6.0, shown in the IDE, and closing (slides 6 and 7)</td><td>1:25</td><td>Jun Ren</td></tr>
 <tr><td class="n">F</td><td>Close and questions</td><td>1:00</td><td>All</td></tr>
-<tr><td></td><td><b>Total</b></td><td><b>about 19:00</b></td><td></td></tr>
+<tr><td></td><td><b>Total</b></td><td><b>about 19:10</b></td><td></td></tr>
 </table>
-<p><b>Driver</b>: at the laptop, clicks only what the run sheet says. <b>Narrator</b>: speaks the lines in
-<span class="say">italics</span> (a guide, not a script to read word for word). Assign the roles and the parts D and E
-presenters before rehearsal.</p>
+<p><b>Samrithi</b> opens. <b>Rafael</b> drives the laptop and speaks for parts A to C. <b>Albin</b>, <b>Jovan</b> and
+<b>Jun Ren</b> present the slides and the IDE in turn. The lines in <span class="say">italics</span> are a guide, not a script
+to read word for word; each speaker ends with the hand-over line shown.</p>
 
 <h2>2. Before the demo</h2>
 <h3>The day before</h3>
@@ -96,7 +97,7 @@ stall with a <b>NEW</b> grade (for step A7). They change over time, so pick them
 <div class="note">Times are cumulative. Requirement IDs (FR, NFR, UC) are listed so the narrator can name them; mentioning a
 few is enough.</div>
 
-<h3>Part 0: Opening (0:00 to 1:30)</h3>
+<h3>Part 0: Opening (0:00 to 1:30) · Samrithi</h3>
 <table class="t">
 <tr><th>#</th><th style="width:21%">Screen and action</th><th>What to say</th><th>Shows</th></tr>
 <tr><td class="n">0.1</td><td>Title slide or the app's Home page</td><td class="say">Hawker food is where most of Singapore eats. But
@@ -105,10 +106,10 @@ whether a dish suits your blood pressure. CleanCravings brings the official answ
 closure dates and HPB's Healthier Dining Programme.</td><td class="req">Problem</td></tr>
 <tr><td class="n">0.2</td><td>Use case diagram</td><td class="say">Our main actor is the diner, as a guest or signed in. Guests can browse
 everything; signing in adds a health profile, bookmarks, closure alerts and a visit log. The external actors are our data
-sources and Google sign-in. Let's start as a guest.</td><td class="req">UC model</td></tr>
+sources and Google sign-in. Rafael will start as a guest.</td><td class="req">UC model</td></tr>
 </table>
 
-<h3>Part A: Guest journey (1:30 to 6:00)</h3>
+<h3>Part A: Guest journey (1:30 to 6:00) · Rafael</h3>
 <table class="t">
 <tr><th>#</th><th style="width:21%">Screen and action</th><th>What to say</th><th>Shows</th></tr>
 <tr><td class="n">A1</td><td><b>For you</b> (Home). In the location bar type a postal code (e.g. <code>639798</code>, NTU) and press <b>Go</b></td>
@@ -141,7 +142,7 @@ guidance. Each rating says why: which rule fired, with its source. The wording i
 never "unhealthy". Photos are freely licensed and credited.</td><td class="req">UC-6.0, NFR-6</td></tr>
 </table>
 
-<h3>Part B: Signed-in journey (6:00 to 11:30)</h3>
+<h3>Part B: Signed-in journey (6:00 to 11:30) · Rafael</h3>
 <table class="t">
 <tr><th>#</th><th style="width:21%">Screen and action</th><th>What to say</th><th>Shows</th></tr>
 <tr><td class="n">B1</td><td><b>Sign in</b> → <b>Continue with Google</b> with the demo account</td><td class="say">Now as a signed-in diner.
@@ -165,7 +166,7 @@ away; the daily sync creates new ones as NEA announces dates.</td><td class="req
 highly get a small boost in my picks.</td><td class="req">UC-4.0, FR-5.8, FR-5.9</td></tr>
 </table>
 
-<h3>Part C: Accessibility, mobile and data trust (11:30 to 13:00)</h3>
+<h3>Part C: Accessibility, mobile and data trust (11:30 to 13:00) · Rafael</h3>
 <table class="t">
 <tr><th>#</th><th style="width:21%">Screen and action</th><th>What to say</th><th>Shows</th></tr>
 <tr><td class="n">C1</td><td><b>Profile</b> → <b>Accessibility</b>: Theme <b>dark</b>, then a larger <b>Text size</b>. Open Finder &amp; Map
@@ -177,27 +178,27 @@ web app, so it works on Android and iPhone browsers without an app store.</td><t
 an official source, through our own server, with a last-updated date. If a source is down, we keep showing the last good
 data with a warning instead of breaking.</td><td class="req">NFR-2, NFR-5, NFR-9</td></tr>
 </table>
-<p>Switch back to light theme and normal text size before part D.</p>
+<p>Switch back to light theme and normal text size, then hand over: <span class="say">Albin will now take you through how it's built.</span></p>
 </section>
 
 <section class="pb">
-<h2>4. SE practices, design and traceability (13:00 to 18:00)</h2>
+<h2>4. SE practices, design and traceability (13:00 to 18:10)</h2>
 <p>Use the slide deck <i>CleanCravings: SE Practices &amp; Traceability</i>; its speaker notes have the full talking points.</p>
 <table class="t">
-<tr><th style="width:9%">Slide</th><th style="width:30%">Topic</th><th>Key points</th><th style="width:9%">Time</th></tr>
-<tr><td class="n">2</td><td>System design at a glance</td><td>Boundary (React pages, FastAPI routers) → control (controllers) → entity (models,
+<tr><th style="width:7%">Slide</th><th style="width:11%">Presenter</th><th style="width:24%">Topic</th><th>Key points</th><th style="width:7%">Time</th></tr>
+<tr><td class="n">2</td><td>Albin</td><td>System design at a glance</td><td>Boundary (React pages, FastAPI routers) → control (controllers) → entity (models,
 Supabase Postgres). Data sync runs nightly outside the request path; a failed run keeps the last good data.</td><td>0:50</td></tr>
-<tr><td class="n">3</td><td>SE practices we applied</td><td>Layered design; rules as data; independent data sync; typed API contract;
-automated tests and CI on every push; secure by default (Google sign-in, row-level security).</td><td>1:00</td></tr>
-<tr><td class="n">4</td><td>Ready for the next version</td><td>New health condition = rows in a CSV; new data source = one sync module;
+<tr><td class="n">3</td><td>Albin</td><td>SE practices we applied</td><td>Layered design; rules as data; independent data sync; typed API contract;
+automated tests and CI on every push; secure by default (Google sign-in, row-level security). Hand over: <span class="say">Jovan will show how this lets us grow, and trace one feature end to end.</span></td><td>1:00</td></tr>
+<tr><td class="n">4</td><td>Jovan</td><td>Ready for the next version</td><td>New health condition = rows in a CSV; new data source = one sync module;
 native app = new client on the same API; push notifications; PostGIS if we outgrow simple distance.</td><td>0:40</td></tr>
-<tr><td class="n">5</td><td>Traceability: UC-3.0 hygiene grades</td><td>FR-2.1, 2.2, 2.5 → UC-3.0 → HygieneController in the class diagram →
+<tr><td class="n">5</td><td>Jovan</td><td>Traceability: UC-3.0 hygiene grades</td><td>FR-2.1, 2.2, 2.5 → UC-3.0 → HygieneController in the class diagram →
 <code>GRADE_RANK</code> and <code>passes_threshold()</code> in the IDE → <code>GradeBadge</code> → Lab 4 black-box tests. Run
-<code>pytest tests/test_lab4.py -k blackbox</code> live.</td><td>1:15</td></tr>
-<tr><td class="n">6</td><td>Traceability: UC-6.0 dish recommendation</td><td>FR-5.6, NFR-6 → UC-6.0 → HealthierEatingController → one row of
+<code>pytest tests/test_lab4.py -k blackbox</code> live. Hand over: <span class="say">Jun Ren will trace our dish ratings.</span></td><td>1:15</td></tr>
+<tr><td class="n">6</td><td>Jun Ren</td><td>Traceability: UC-6.0 dish recommendation</td><td>FR-5.6, NFR-6 → UC-6.0 → HealthierEatingController → one row of
 <code>classification_rules.csv</code> → <code>evaluate()</code> → <code>labels.ts</code> wording → generated boundary tests and the
 Lab 4 basis path tests. Run <code>pytest tests/test_rules.py -q</code> live.</td><td>1:15</td></tr>
-<tr><td class="n">7</td><td>Closing slide</td><td>Requirements, design, code and tests stay linked.</td><td>0:10</td></tr>
+<tr><td class="n">7</td><td>Jun Ren</td><td>Closing slide</td><td>Requirements, design, code and tests stay linked. <span class="say">Thank you. We're happy to take questions.</span> Questions: everyone.</td><td>0:10</td></tr>
 </table>
 
 <h2>5. If something goes wrong</h2>

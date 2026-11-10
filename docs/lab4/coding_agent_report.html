@@ -1,0 +1,409 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Lab 4 Coding Agent Report</title><style>
+@page { size: A4; margin: 16mm 15mm; @bottom-right { content: "Page " counter(page); font: 9pt Arial, sans-serif; color: #555; }
+  @bottom-left { content: "SC2006 SCSL Group 4 | Lab 4 coding agent report"; font: 9pt Arial, sans-serif; color: #555; } }
+body { font: 10.3pt/1.45 Arial, Helvetica, sans-serif; color: #111; }
+h1 { font-size: 23pt; margin: 6px 0 16px; } h2 { font-size: 14.5pt; margin: 16px 0 6px; border-bottom: 1.5px solid #222; padding-bottom: 2px; }
+h3 { font-size: 11.5pt; margin: 12px 0 4px; } h5 { font-size: 10pt; margin: 8px 0 2px; } p { margin: 5px 0; } ul, ol { margin: 4px 0; padding-left: 20px; } li { margin: 2px 0; }
+.cover { padding-top: 38mm; } .course { font-size: 13pt; color: #444; margin: 0; }
+.meta { border-collapse: collapse; margin: 10px 0 22px; } .meta td { padding: 4px 14px 4px 0; vertical-align: top; } .meta td:first-child { font-weight: bold; }
+table.facts { border-collapse: collapse; margin: 6px 0 8px; width: 100%; font-size: 9.5pt; }
+table.facts td { border: 1px solid #aaa; padding: 3px 6px; vertical-align: top; } table.facts td:first-child { width: 30%; background: #eef5fb; font-weight: bold; }
+code { font: 8.8pt Consolas, monospace; background: #f2f2f2; padding: 0 2px; }
+.prompt { background: #f1f1f1; border-left: 3px solid #555; padding: 6px 10px; font: 9pt Consolas, monospace; }
+.prompt p { margin: 0 0 6px; white-space: pre-wrap; } .prompt p:last-child { margin: 0; }
+.reply { border: 1px solid #bbb; padding: 4px 11px; font-size: 9pt; line-height: 1.4; }
+.reply ul, .reply ol { padding-left: 18px; }
+table.ai { border-collapse: collapse; width: 100%; margin: 5px 0; font-size: 8.6pt; } table.ai th, table.ai td { border: 1px solid #999; padding: 2px 5px; vertical-align: top; text-align: left; }
+table.ai th { background: #e8e8e8; } table.ai tr { break-inside: avoid; }
+pre { font: 7.6pt/1.3 Consolas, monospace; background: #fafafa; border: 1px solid #ddd; padding: 6px; white-space: pre-wrap; word-break: break-all; }
+.pb { break-before: page; }
+</style></head><body>
+<section class="cover">
+<p class="course">SC2006 Software Engineering</p>
+<h1>Lab 4 Deliverables: Coding Agent Report</h1>
+<table class="meta">
+<tr><td>Lab group</td><td>SCSL, Group 4</td></tr>
+<tr><td>Team</td><td>CleanCravings</td></tr>
+<tr><td>Members</td><td>Rafael, Albin, Samrithi, Jovan, Jun Ren</td></tr>
+<tr><td>Author(s) of this document</td><td>Rafael, Albin</td></tr>
+<tr><td>Coding agent</td><td>Claude Code 2.1.306 (Anthropic's coding agent, used from the terminal), model Claude Opus 5.5</td></tr>
+<tr><td>Date of the experiments</td><td>5 November 2026</td></tr>
+</table>
+<h2>Contents</h2>
+<ol>
+<li>How we ran the experiments</li>
+<li>Exercise 3.3.2: regenerating a deleted control class (HygieneController)</li>
+<li>Exercise 3.3.3: code quality review and refactoring</li>
+<li>Appendix: prompts, the agent's replies, its code and its changes</li>
+</ol>
+</section>
+
+<section class="pb">
+<h2>1. How we ran the experiments</h2>
+<p>The lab suggests an in-IDE agent such as Cline. We used <b>Claude Code</b>, a comparable coding agent that reads and edits the
+files of a project itself. For each experiment:</p>
+<ul>
+<li>We exported a <b>fresh copy</b> of our repository into an empty folder and started a <b>new agent session</b> there, so the agent
+had no memory of earlier work and could not see our real working copy. We removed <code>CLAUDE.md</code> (our notes for AI tools)
+from the copy, because it describes HygieneController's rules in prose and would have given the answer away.</li>
+<li>The agent could <b>read, search, create and edit files</b> in the copy, but <b>could not run commands</b>. We ran the test suite
+ourselves afterwards, so we could see exactly what it changed and judge it against the same tests we use.</li>
+<li>We compared its files with the originals (<code>diff</code>) and ran our full backend test suite (pytest), which includes the
+Lab 4 black-box and basis path tests.</li>
+</ul>
+<p>The exact prompts and the agent's replies are in the appendix. The files it produced are kept in
+<code>docs/lab4/agent_experiments/</code> in our repository.</p>
+
+<h2>2. Exercise 3.3.2: regenerating HygieneController</h2>
+<h3>What we did</h3>
+<p>We chose <b>HygieneController</b>, the control class we black-box tested (section 1 of our Lab 4 test cases). We deleted the
+whole file, <code>backend/app/controllers/hygiene_controller.py</code>; with it gone, the test suite could not even start (an
+import error during collection). We then gave the agent one prompt (appendix A.1) telling it the file had been deleted and
+pointing it to:</p>
+<ul>
+<li>our tests, especially the Lab 4 black-box tests of <code>passes_threshold</code>;</li>
+<li>the code that calls HygieneController;</li>
+<li>our design class diagrams and the requirements cited in code comments (FR-2.1 to FR-2.5).</li>
+</ul>
+<p>We did not give it the original class, not even with the function bodies removed.</p>
+
+<h3>Result</h3>
+<table class="facts">
+<tr><td>Iterations needed</td><td>None: one prompt, no follow-up</td></tr>
+<tr><td>Agent's work</td><td>About 1 minute 45 seconds; 18 file reads and searches, then one file written</td></tr>
+<tr><td>Other files changed</td><td>None (checked with <code>diff</code>)</td></tr>
+<tr><td>Test suite on its class</td><td><b>127 passed, 1 skipped, 1 warning in 6.07s</b>, the same as with our original class</td></tr>
+</table>
+<p>The agent rebuilt the class with the same public interface as ours: the <code>GRADE_RANK</code> ordering A &gt; B &gt; NEW &gt; C
+and the four methods <code>current_grade</code>, <code>passes_threshold</code>, <code>summary</code> and <code>track_record</code>,
+with the same signatures. It worked these out from the callers and the class diagrams, and the rules from the tests: for
+example, that a stall with no current grade fails any minimum, and that a snapshot older than the latest SFA export means
+the grade is no longer current. It added docstrings citing the requirements, and sorted the grade history by date instead
+of relying on the database's ordering.</p>
+<p>Comparing it with our original, line by line, showed <b>two differences in behaviour that none of our tests detected</b>:</p>
+<ol>
+<li><b><code>summary()</code> counts only Cooked Food stalls</b>; ours counted every stall passed to it. Our SFA import only keeps
+Cooked Food stalls (all 5,614 stalls in our data are), so this makes no visible difference today; the agent's version is
+the more defensive one (FR-1.6).</li>
+<li><b><code>track_record()</code> lists every grade snapshot</b>; ours collapses consecutive identical snapshots so the history shows
+only changes. Every licence has one snapshot so far, so the two look the same now, but after a few months of daily SFA imports
+the agent's version would show dozens of identical "A" rows on a stall page. This would be a real regression, and our tests
+only check that the history is not empty.</li>
+</ol>
+<p>It also turned our comment "Team to confirm this choice" about where NEW ranks into a settled statement citing FR-2.2.</p>
+<p>A second run of the same prompt happened by accident after the first had finished. That session found the agent's own new
+file, took it for the original and refused to overwrite it, saying a rewrite after reading it would not be a valid "from
+scratch" result (appendix A.3). It did not change anything.</p>
+
+<h3>Reflection</h3>
+<p>The outcome exceeded our expectations: the agent rebuilt a working class in one attempt, from tests and diagrams alone, without
+seeing the original or running the tests. Its explanation was accurate and traced each decision to a test or a requirement. The
+experiment also showed how much it relied on our tests to define "correct": where a behaviour was only in our code and not in
+a test or a diagram (collapsing the grade history), it reasonably chose something else, and the suite still passed. The lesson
+for us is that our tests are the real specification when an AI writes code, so the gap to close is a test for the collapsed grade
+history. Had the agent failed, the next steps we had planned were to paste the test failures back to it, then to give it the
+original file with only the function bodies removed.</p>
+</section>
+
+<section class="pb">
+<h2>3. Exercise 3.3.3: code quality review and refactoring</h2>
+<h3>What we did</h3>
+<p>Our further experiment was the lab's third suggestion: ask the agent for its opinion on the quality of our codebase, and have it
+carry out one of its refactoring suggestions. In a new fresh copy and a new session, we asked it (appendix B.1) to rank the five
+refactorings that would most improve the backend, with reasons and risks, then to carry out only the top one without changing
+behaviour or tests, and to explain how it made sure behaviour was unchanged.</p>
+
+<h3>Result</h3>
+<table class="facts">
+<tr><td>Iterations needed</td><td>None: one prompt, no follow-up</td></tr>
+<tr><td>Agent's work</td><td>About 3 minutes 10 seconds over 43 steps of reading and editing</td></tr>
+<tr><td>Files changed</td><td>4 controller files, 48 changed lines; no tests changed</td></tr>
+<tr><td>Test suite before and after</td><td>127 passed, 1 skipped, 1 warning in 5.93s after, the same as before</td></tr>
+<tr><td>Our extra check</td><td>The original and refactored centre list and recommendations give <b>identical results on our real data
+in all 15 scenarios we tried</b> (every minimum grade, with and without the halal restriction)</td></tr>
+</table>
+<p><b>Its five suggestions</b> (in full in appendix B.2):</p>
+<ol>
+<li>define each stall-filtering rule once;</li>
+<li>share the centre query and the Cooked Food filter;</li>
+<li>split up the 100-line <code>recommend()</code> method;</li>
+<li>move business logic out of the API router;</li>
+<li>cut the per-row database queries in the SFA import.</li>
+</ol>
+<p>Each came with a specific reason and a sensible risk. For example, for number 5 it warned that a licence appearing twice in one
+export would behave differently, and said to add a test for that first.</p>
+<p><b>The refactoring it carried out</b> (number 1) was well chosen:</p>
+<ul>
+<li><b>One rule instead of three.</b> Our minimum-grade rule (FR-2.5) was written out in three places: <code>passes_threshold</code>,
+the cached centre list and the recommendations. The halal check and the suspension flag were each written twice. It added
+<code>HygieneController.grade_passes()</code> and <code>suspended_past_year()</code> and made every caller use them.</li>
+<li><b>It caught an error in our own documentation.</b> Our Lab 4 test document says the centre list and recommendations use
+<code>passes_threshold()</code>. They had kept their own copies of the rule since we added caching, so our 16 black-box tests only
+covered one of the three copies.</li>
+<li><b>It named a remaining gap.</b> No test checks which centres the minimum-grade filter returns.</li>
+</ul>
+
+<h3>Reflection</h3>
+<p>This met and in places exceeded our expectations. The review was specific to our code rather than generic advice, the ranking
+was reasonable, and the refactoring was small, safe and easy to check. Its "proof" that behaviour was unchanged was careful
+reasoning, not a test run, since it could not run commands; we confirmed it with the test suite and the real-data comparison.
+The most valuable result was finding the mismatch between our test document and our code, which a human review had missed. Adopting
+this refactoring would make the rule our black-box tests cover the one every list uses, and the missing centre-list test
+would close the gap it found. Its suggestions 3 and 5 are medium risk, and we would only attempt them with new tests in place first, as it
+advised.</p>
+</section>
+
+<section class="pb">
+<h2>Appendix</h2>
+<h3>A.1 Exercise 3.3.2: our prompt</h3>
+<div class='prompt'><p>This is our SC2006 group project, CleanCravings (FastAPI backend in backend/, React frontend in frontend/). The file backend/app/controllers/hygiene_controller.py, which contained our control class HygieneController, has been deleted. Please recreate it from scratch.</p><p>To work out what it must do, use:
+- the tests in backend/tests/, especially tests/test_lab4.py (black-box tests of HygieneController.passes_threshold) and tests/test_api.py;
+- the rest of the codebase, in particular the places that import and call HygieneController (backend/app/controllers/);
+- our design class diagrams in docs/diagrams/ (design_class_app.puml and overall_class.puml) and the requirements cited in the code comments (FR-2.1 to FR-2.5).</p><p>Only create backend/app/controllers/hygiene_controller.py; do not change any other file. When you are done, briefly explain your design decisions.</p></div>
+<h3>A.2 The agent's reply</h3>
+<div class='reply'><p>I've recreated <code>backend/app/controllers/hygiene_controller.py</code> and changed no other file. I couldn't run the tests because there's no shell in this session. I checked the file by hand against all 16 black-box cases in <code>test_lab4.py</code> and against <code>test_etl.py</code>, <code>test_api.py</code> and the three callers. Run <code>pytest</code> in <code>backend/</code> to confirm.</p>
+<p><b>What the class provides.</b> The callers and both class diagrams use a module-level <code>GRADE_RANK</code> and four static methods: <code>current_grade</code>, <code>passes_threshold</code>, <code>summary</code> and <code>track_record</code>. The class has those and nothing more.</p>
+<p><b>Design decisions:</b></p>
+<ol><li><b>Grade order A=4, B=3, NEW=2, C=1 (FR-2.2).</b> NEW sits above C so it never looks like a failing grade, which tests BB-07 and BB-08 check. All ranks are above 0 because <code>HawkerCentreController._cached_summaries</code> uses <code>default=0</code> to mean "no graded stall".</li><li><b><code>current_grade(licensee)</code> (FR-2.1).</b> It takes the newest snapshot, sorted by date. It doesn't rely on the database's ordering because the Lab 4 tests build objects in memory. If that snapshot is older than <code>last_seen_snapshot</code>, it returns <code>None</code>: the latest SFA export listed the licence without a grade, such as "Not Under SAFE". Tests BB-14, BB-15 and the ETL "Not Under SAFE" test cover this.</li><li><b><code>passes_threshold(stall, threshold)</code> (FR-2.5, FR-5.4).</b> With no minimum set, every stall passes. With a minimum, a stall passes only if its grade ranks at or above it. A stall with no current grade or no linked licensee fails. This matches the rule <code>RecommendationController</code> already copies inline. Invalid minimums such as "D" or "a" are rejected by the API (HTTP 422) before they reach this method, so it doesn't check for them.</li><li><b><code>summary(stalls)</code>.</b> It counts only Cooked Food stalls (FR-1.6), because <code>presenters.centre_summary</code> passes it all of a centre's stalls. Stalls with no current grade are counted as <code>ungraded</code>.</li><li><b><code>track_record(stall)</code> (FR-2.3, FR-2.4).</b> It's built from the snapshots rather than stored, as the entity diagram notes.<ul><li><b>Suspended flag:</b> it comes from <code>licence_status</code>, which is what the ETL test needs and what <code>stall_summary</code> uses. The grade row can't be used because a "Not Under SAFE" export creates no grade row.</li><li><b>Last updated:</b> this is the date of the latest SFA export that listed the licence.</li><li><b>Grade history:</b> all grades, newest first.</li><li><b>Demerit points:</b> this stays null because SFA doesn't publish them.</li><li><b>No licensee:</b> it returns an empty record instead of failing.</li></ul></li></ol></div>
+<h3>A.3 The accidental second run's reply</h3>
+<div class='reply'><p>I haven't recreated the file, because it hasn't been deleted. <code>backend/app/controllers/hygiene_controller.py</code> still exists with a complete 69-line implementation of <code>HygieneController</code>, so I stopped instead of overwriting it.</p>
+<p><b>The existing file matches everything you pointed me to.</b> I checked it by reading only; I couldn't run pytest here.</p>
+<ul><li><b>Design class diagram</b> (<code>design_class_app.puml:111</code>): it has <code>GRADE_RANK</code> (A &gt; B &gt; NEW &gt; C), <code>current_grade</code>, <code>passes_threshold</code>, <code>summary</code> and <code>track_record</code>, with the same names and signatures.</li><li><b>Callers:</b> <code>hawker_centre_controller.py</code> imports <code>GRADE_RANK</code> and <code>HygieneController</code> and uses <code>0</code> to mean "no current grade", which works because every rank is above 0. <code>presenters.py</code> uses <code>current_grade</code> and <code>summary</code>, and <code>recommendation_controller.py</code> uses <code>GRADE_RANK</code>. All of these exist.</li><li><b>test_lab4.py BB-01 to BB-16:</b> with no minimum, every stall passes. A stall with no grade or no licensee fails any minimum. The newest snapshot counts as the current grade only if it's dated on or after <code>last_seen_snapshot</code>. All 16 cases agree with the code.</li><li><b>test_etl.py:</b> "Not Under SAFE" clears the current grade, and <code>track_record</code> reports suspension, <code>last_updated</code> and the grade history. The code handles all of these.</li></ul>
+<p><b>Why I didn't overwrite it:</b> a rewrite now wouldn't really be "from scratch", because I've already read the original. It would also mean replacing working code that matches your design with my own version for no benefit. If this is an exercise to see whether the class can be rebuilt from the tests, diagrams and requirements alone, the deletion didn't happen and the result wouldn't be valid.</p>
+<p>How would you like to continue?</p>
+<ol><li><b>Keep the existing file.</b> You don't need to do anything, and you can run <code>pytest backend/tests</code> to confirm it passes.</li><li><b>Delete it yourself and start a fresh session.</b> I can then rebuild it from the tests, diagrams and FR-2.1 to FR-2.5 without having seen the original.</li><li><b>Have me rewrite it here anyway.</b> I'll do that if you want, but the result will be shaped by the version I've already read.</li></ol></div>
+<h3 class="pb">A.4 The class the agent wrote</h3>
+<pre>&quot;&quot;&quot;HygieneController (FR-2.1 to FR-2.5).
+
+Works out a stall&#x27;s current SAFE grade from the dated SFA snapshots, its track record,
+and whether it meets a user&#x27;s Hygiene Threshold (also used for FR-5.4).&quot;&quot;&quot;
+
+from collections.abc import Iterable
+
+from ..models import Licensee, SAFEGrade, SafeGradeValue, Stall, StallType
+from ..schemas import GradeSummary, SafeGradeOut, TrackRecordOut
+
+# A &gt; B &gt; NEW &gt; C. NEW (licensed under a year) ranks above C because SFA says it
+# must not be presented as a failing grade (FR-2.2). All ranks are &gt; 0, so callers
+# can use 0 for &quot;no current grade&quot;.
+GRADE_RANK = {SafeGradeValue.A: 4, SafeGradeValue.B: 3, SafeGradeValue.NEW: 2, SafeGradeValue.C: 1}
+
+
+def _history(licensee: Licensee) -&gt; list[SAFEGrade]:
+    # Newest first. The relationship is already ordered that way when loaded from the
+    # database, but objects built in memory may not be
+    return sorted(licensee.grades, key=lambda g: g.snapshot_date, reverse=True)
+
+
+class HygieneController:
+    @staticmethod
+    def current_grade(licensee: Licensee | None) -&gt; SAFEGrade | None:
+        &quot;&quot;&quot;The newest snapshot (FR-2.1), but only if it came from the latest SFA export that
+        listed the licence. An older one means SFA no longer gives it a grade there
+        (e.g. &quot;Not Under SAFE&quot;), so there is no current grade.&quot;&quot;&quot;
+        if licensee is None or not licensee.grades:
+            return None
+        newest = _history(licensee)[0]
+        if licensee.last_seen_snapshot and newest.snapshot_date &lt; licensee.last_seen_snapshot:
+            return None
+        return newest
+
+    @staticmethod
+    def passes_threshold(stall: Stall, threshold: SafeGradeValue | None) -&gt; bool:
+        &quot;&quot;&quot;True if the stall&#x27;s current grade ranks at or above the minimum (FR-2.5, FR-5.4).
+        With no minimum every stall passes; with one, a stall with no current grade (or no
+        licensee) fails, so ungraded stalls are never shown to someone who asked for a minimum.&quot;&quot;&quot;
+        if threshold is None:
+            return True
+        g = HygieneController.current_grade(stall.licensee)
+        return g is not None and GRADE_RANK[g.grade_value] &gt;= GRADE_RANK[threshold]
+
+    @staticmethod
+    def summary(stalls: Iterable[Stall]) -&gt; GradeSummary:
+        &quot;&quot;&quot;How many of a centre&#x27;s Cooked Food stalls (FR-1.6) hold each current grade.&quot;&quot;&quot;
+        counts = {&quot;A&quot;: 0, &quot;B&quot;: 0, &quot;C&quot;: 0, &quot;NEW&quot;: 0, &quot;ungraded&quot;: 0}
+        for s in stalls:
+            if s.stall_type != StallType.COOKED_FOOD:
+                continue
+            g = HygieneController.current_grade(s.licensee)
+            counts[g.grade_value.value if g else &quot;ungraded&quot;] += 1
+        return GradeSummary(**counts)
+
+    @staticmethod
+    def track_record(stall: Stall) -&gt; TrackRecordOut:
+        &quot;&quot;&quot;Built from the snapshots, not stored (FR-2.3, FR-2.4). SFA only publishes a
+        &quot;suspended in the past year&quot; flag, not demerit points, so total_demerit_points stays null.&quot;&quot;&quot;
+        lic = stall.licensee
+        if lic is None:
+            return TrackRecordOut(suspended_past_year=False, grade_history=[], last_updated=None)
+        return TrackRecordOut(
+            suspended_past_year=lic.licence_status == &quot;suspended&quot;,
+            grade_history=[SafeGradeOut.model_validate(g) for g in _history(lic)],
+            last_updated=lic.last_seen_snapshot,
+        )</pre>
+
+<h3 class="pb">B.1 Exercise 3.3.3: our prompt</h3>
+<div class='prompt'><p>This is our SC2006 group project, CleanCravings (FastAPI backend in backend/, React frontend in frontend/). Please review the code quality of the backend (backend/app and backend/etl).</p><p>1. Give us the five refactorings you think would most improve it, ranked, each with the reason and the risk.
+2. Then carry out only your top-ranked refactoring. Keep the behaviour exactly the same and don&#x27;t change any tests.</p><p>You can&#x27;t run commands in this session, so explain how you made sure the behaviour is unchanged. We will run the test suite afterwards.</p></div>
+<h3>B.2 The agent's reply</h3>
+<div class='reply'><p>I've ranked five refactorings below and done the top one. I couldn't run anything here, so the test suite hasn't been run yet.</p>
+<h5>1. The five refactorings, ranked</h5>
+<p><b>1. Define each stall-filtering rule once (done, details below).</b></p>
+<ul><li><b>Why:</b> the minimum-grade rule (FR-2.5) was written out three times. <code>HygieneController.passes_threshold</code> had it, the centre list kept its own grade-number comparison, and the recommendations kept a third copy with a comment saying "Same rule as…". The halal check and the "suspended" flag were each written twice. Your Lab 4 report (<code>docs/lab4/lab4_test_cases.html:46</code>) says <code>passes_threshold()</code> is what the centre list and recommendations use, but they never called it. So the 16 black-box tests only covered one of the three copies.</li><li><b>Risk:</b> low. Each change swaps code for an equivalent call. The only change in shape is in-memory cached data that nothing outside the controller reads.</li></ul>
+<p><b>2. Share the centre query and the Cooked Food filter.</b></p>
+<ul><li><b>Why:</b> <code>_centre_query()</code> and <code>_cooked()</code> in <code>hawker_centre_controller.py</code> are copied by hand into <code>recommendation_controller.py:47-62</code>. The stall loading options are repeated in <code>search</code> and <code>stall_detail</code>. Also, <code>centre_detail</code> and <code>stall_detail</code> call <code>hdp_counts(db)</code>, which counts every centre in the database just to read one number.</li><li><b>Risk:</b> low. If the shared query loads less up front than the copy did, you'd get many extra database queries (much slower), but the results wouldn't change.</li></ul>
+<p><b>3. Split up <code>RecommendationController.recommend</code> (about 100 lines).</b></p>
+<ul><li><b>Why:</b> loading the user's data, the filters, six counters, the scoring weights and the per-centre limit are all in one loop. The scoring is the logic you're most likely to tune, and right now it can't be tested on its own. Pull out a small user-context object, a <code>_score(...) -&gt; (score, reasons)</code> function and a <code>_cap_per_centre</code> function.</li><li><b>Risk:</b> medium. The order of the reasons, the floating-point sums and the tie-breaks all have to stay exactly the same. Write unit tests that pin the current output before moving anything.</li></ul>
+<p><b>4. Move business logic out of <code>routers/public.py</code>.</b></p>
+<ul><li><b>Why:</b> the router works out freshness and staleness, picks the default dish profile, decides the halal default and calls OneMap directly. Your class diagrams describe routers as a thin layer over the controllers. The "SQLite drops the timezone" fix also exists twice (<code>user_controllers._utc</code> and an inline copy in <code>freshness</code>).</li><li><b>Risk:</b> low to medium. Watch for import cycles. Tests that patch <code>httpx</code> will have to patch it in the new module, which means editing tests, so do that step on its own.</li></ul>
+<p><b>5. Cut the per-row database queries in the ETL scripts.</b></p>
+<ul><li><b>Why:</b> <code>sfa_import.load</code> runs up to three queries for every row (licensee, stall, grade). That's tens of thousands of round trips per full export against Supabase. Load them all up front into dictionaries. Smaller fixes alongside it: <code>seed_reference.load</code> reads the rules CSV twice, and <code>nea_sync.parse_row</code> repeats the closure-reason logic.</li><li><b>Risk:</b> medium. Sessions are created with <code>autoflush=False</code>, so today a licence that appears twice in one export probably fails when the data is saved. With dictionaries, the second row would quietly update the first instead, which changes behaviour. Add a test for duplicate rows first.</li></ul>
+<h5>2. What I changed (#1)</h5>
+<table class='ai'><tr><th>File</th><th>Change</th></tr><tr><td><code>hygiene_controller.py</code></td><td>New <code>grade_passes(grade, threshold)</code> holds the one copy of the rule. <code>passes_threshold</code> now calls it. New <code>suspended_past_year(licensee)</code>, also used by <code>track_record</code>.</td></tr><tr><td><code>hawker_centre_controller.py</code></td><td>The cache stores each centre's best grade instead of its grade number. The centre list filter calls <code>grade_passes</code>.</td></tr><tr><td><code>recommendation_controller.py</code></td><td>Uses <code>grade_passes</code> and <code>confirmed_halal</code> instead of its own copies. The <code>GRADE_RANK</code> import is gone.</td></tr><tr><td><code>presenters.py</code></td><td>Uses <code>suspended_past_year</code>. <code>confirmed_halal</code> now also accepts a <code>StallSummary</code>.</td></tr></table>
+<p>No tests, API fields or database queries changed.</p>
+<h5>How I checked the behaviour is the same</h5>
+<p>I compared old and new code case by case:</p>
+<ul><li><b><code>passes_threshold</code>:</b> it still returns <code>True</code> straight away when no minimum is set, so it doesn't look up the grade in that case, exactly as before. Otherwise it does the same two checks in the same order: no grade means hidden, then grade numbers are compared with <code>&gt;=</code>.</li><li><b>Centre list:</b> before, it skipped a centre when <code>min_grade and best_rank &lt; GRADE_RANK[min_grade]</code>, where <code>best_rank</code> was 0 if the centre had no graded stalls.<ul><li>No minimum set: neither version skips the centre.</li><li>Minimum set, no graded stalls: old compares <code>0 &lt; rank</code>, which is true, so skipped. New: <code>grade_passes(None, min)</code> is <code>False</code>, so skipped.</li><li>Minimum set, best grade <code>g</code>: each grade has its own distinct number, so the best grade has the highest number and both versions compare <code>GRADE_RANK[g] &gt;= GRADE_RANK[min]</code>.</li></ul></li><li><b>Recommendations:</b> before, it skipped when <code>threshold and (grade is None or rank &lt; min)</code>. The minimum is a string enum and never empty, so <code>threshold</code> is truthy exactly when it isn't <code>None</code>. That makes the old condition the exact opposite of <code>grade_passes</code>. <code>s.halal is not True</code> is literally <code>not confirmed_halal(s)</code>, and the counters still go up on the same branches.</li><li><b>Suspended flag:</b> the same expression, moved into one function.</li><li><b>Imports:</b> I checked the import chain for cycles and confirmed everything is imported where it's used (<code>SafeGradeValue</code> was already imported in the centre controller).</li></ul>
+<p>Tests that cover these paths: the 16 <code>test_lab4.py::test_blackbox_passes_threshold</code> cases, plus the <code>min_grade</code>, halal and <code>excluded_by_hygiene</code> checks in <code>test_api.py</code>.</p>
+<p>One gap: no existing test checks which centres <code>/api/centres?min_grade=…</code> returns; the only test there just checks a 422 for an invalid grade. That path is the one I reasoned through most carefully above. When you add tests next, one comparing that list against <code>passes_threshold</code> on each centre's stalls would cover it.</p></div>
+<h3 class="pb">B.3 The changes it made</h3>
+<pre class="diff">diff -u -x __pycache__ original/backend/app/controllers/hawker_centre_controller.py refactored/backend/app/controllers/hawker_centre_controller.py
+--- original/backend/app/controllers/hawker_centre_controller.py	2026-11-05 23:34:55.000000000 +0800
++++ refactored/backend/app/controllers/hawker_centre_controller.py	2026-11-05 23:47:13.468803000 +0800
+@@ -71,19 +71,19 @@
+         return _photos[centre_id]
+ 
+     @classmethod
+-    def _cached_summaries(cls, db: Session, today: date) -&gt; list[tuple[CentreSummary, int, str]]:
+-        &quot;&quot;&quot;Centre summaries without distance, plus the best current grade rank among each
++    def _cached_summaries(cls, db: Session, today: date) -&gt; list[tuple[CentreSummary, SafeGradeValue | None, str]]:
++        &quot;&quot;&quot;Centre summaries without distance, plus the best current grade among each
+         centre&#x27;s Cooked Food stalls and the text that search matches against. Cached (see
+         controllers/cache.py), so each request only works out distance (NFR-1).&quot;&quot;&quot;
+ 
+-        def build() -&gt; list[tuple[CentreSummary, int, str]]:
++        def build() -&gt; list[tuple[CentreSummary, SafeGradeValue | None, str]]:
+             counts = cls.hdp_counts(db)
+             rows = []
+             for c in db.scalars(_centre_query()).all():
+                 grades = (HygieneController.current_grade(s.licensee) for s in _cooked(c.stalls))
+-                best_rank = max((GRADE_RANK[g.grade_value] for g in grades if g is not None), default=0)
++                best = max((g.grade_value for g in grades if g is not None), key=GRADE_RANK.__getitem__, default=None)
+                 haystack = f&quot;{c.centre_name} {c.street_address or &#x27;&#x27;} {c.postal_code or &#x27;&#x27;}&quot;.lower()
+-                rows.append((centre_summary(c, today, None, counts.get(c.id, 0)), best_rank, haystack))
++                rows.append((centre_summary(c, today, None, counts.get(c.id, 0)), best, haystack))
+             return rows
+ 
+         return cached(&quot;centre_summaries&quot;, db, today, build)
+@@ -101,13 +101,14 @@
+     ) -&gt; list[CentreSummary]:
+         out: list[CentreSummary] = []
+         needle = (q or &quot;&quot;).strip().lower()
+-        for base, best_rank, haystack in cls._cached_summaries(db, today):
++        for base, best_grade, haystack in cls._cached_summaries(db, today):
+             if region and base.region != region:
+                 continue
+             if needle and needle not in haystack:
+                 continue
+-            # Same result as passes_threshold() on each Cooked Food stall (FR-2.5)
+-            if min_grade and best_rank &lt; GRADE_RANK[min_grade]:
++            # A centre is listed if at least one Cooked Food stall meets the minimum (FR-2.5),
++            # i.e. if its best one does
++            if not HygieneController.grade_passes(best_grade, min_grade):
+                 continue
+             dist = round(haversine_km(origin[0], origin[1], base.latitude, base.longitude), 2) if origin else None
+             if radius_km and dist is not None and dist &gt; radius_km:
+diff -u -x __pycache__ original/backend/app/controllers/hygiene_controller.py refactored/backend/app/controllers/hygiene_controller.py
+--- original/backend/app/controllers/hygiene_controller.py	2026-11-05 23:34:55.000000000 +0800
++++ refactored/backend/app/controllers/hygiene_controller.py	2026-11-05 23:46:57.758932800 +0800
+@@ -20,14 +20,26 @@
+             return None  # latest SFA export had no SAFE grade for this licence
+         return latest
+ 
++    @staticmethod
++    def grade_passes(grade: SafeGradeValue | None, threshold: SafeGradeValue | None) -&gt; bool:
++        &quot;&quot;&quot;The Hygiene Threshold rule (FR-2.5) on a grade value. Every list that filters by a
++        minimum grade (centre list, centre page, recommendations) goes through this.&quot;&quot;&quot;
++        if threshold is None:
++            return True
++        if grade is None:
++            return False  # can&#x27;t show an ungraded stall to someone who set a minimum
++        return GRADE_RANK[grade] &gt;= GRADE_RANK[threshold]
++
+     @classmethod
+     def passes_threshold(cls, stall: Stall, threshold: SafeGradeValue | None) -&gt; bool:
+         if threshold is None:
+             return True
+         g = cls.current_grade(stall.licensee)
+-        if g is None:
+-            return False  # can&#x27;t show an ungraded stall to someone who set a minimum
+-        return GRADE_RANK[g.grade_value] &gt;= GRADE_RANK[threshold]
++        return cls.grade_passes(g.grade_value if g else None, threshold)
++
++    @staticmethod
++    def suspended_past_year(licensee: Licensee | None) -&gt; bool:
++        return bool(licensee and licensee.licence_status == &quot;suspended&quot;)
+ 
+     @classmethod
+     def summary(cls, stalls: Iterable[Stall]) -&gt; GradeSummary:
+@@ -49,7 +61,7 @@
+             if not changes or changes[-1].grade_value != g.grade_value:
+                 changes.append(g)
+         return TrackRecordOut(
+-            suspended_past_year=bool(stall.licensee and stall.licensee.licence_status == &quot;suspended&quot;),
++            suspended_past_year=cls.suspended_past_year(stall.licensee),
+             grade_history=[SafeGradeOut.model_validate(g) for g in reversed(changes)],
+             last_updated=stall.licensee.last_seen_snapshot if stall.licensee else None,
+         )
+diff -u -x __pycache__ original/backend/app/controllers/presenters.py refactored/backend/app/controllers/presenters.py
+--- original/backend/app/controllers/presenters.py	2026-11-05 23:34:55.000000000 +0800
++++ refactored/backend/app/controllers/presenters.py	2026-11-05 23:47:02.808633300 +0800
+@@ -19,7 +19,7 @@
+         cuisine=stall.cuisine,
+         price_range=stall.price_range,
+         safe_grade=SafeGradeOut.model_validate(g) if g else None,
+-        suspended_past_year=bool(stall.licensee and stall.licensee.licence_status == &quot;suspended&quot;),
++        suspended_past_year=HygieneController.suspended_past_year(stall.licensee),
+         hdp_participant=stall.hdp is not None,
+         hdp_category=stall.hdp.participation_category if stall.hdp else None,
+         hdp_match_method=stall.hdp.match_method if stall.hdp else None,
+@@ -31,7 +31,7 @@
+     return bool(profile and &quot;HALAL&quot; in (profile.dietary_restrictions or []))
+ 
+ 
+-def confirmed_halal(stall: Stall) -&gt; bool:
++def confirmed_halal(stall: Stall | StallSummary) -&gt; bool:
+     # Only an explicit True counts. None means the stall hasn&#x27;t published it, not that it&#x27;s non-halal
+     return stall.halal is True
+ 
+diff -u -x __pycache__ original/backend/app/controllers/recommendation_controller.py refactored/backend/app/controllers/recommendation_controller.py
+--- original/backend/app/controllers/recommendation_controller.py	2026-11-05 23:34:55.000000000 +0800
++++ refactored/backend/app/controllers/recommendation_controller.py	2026-11-05 23:47:19.727499600 +0800
+@@ -15,8 +15,8 @@
+ from ..schemas import CentreStatus, RecommendationItem, RecommendationOut, StallSummary
+ from .cache import cached
+ from .closure_controller import ClosureController
+-from .hygiene_controller import GRADE_RANK
+-from .presenters import stall_summary, wants_halal
++from .hygiene_controller import HygieneController
++from .presenters import confirmed_halal, stall_summary, wants_halal
+ 
+ DISCLAIMER = (
+     &quot;Suggestions are ordered using official SFA, NEA and HPB data plus your preferences. &quot;
+@@ -104,12 +104,11 @@
+                 continue
+             for s in c.stalls:
+                 grade = s.safe_grade.grade_value if s.safe_grade else None
+-                # Same rule as HygieneController.passes_threshold: no current grade fails any minimum
+-                if threshold and (grade is None or GRADE_RANK[grade] &lt; GRADE_RANK[threshold]):
++                if not HygieneController.grade_passes(grade, threshold):
+                     excluded_hygiene += 1
+                     continue
+                 if halal_only:
+-                    if s.halal is not True:  # as presenters.confirmed_halal: None means unknown
++                    if not confirmed_halal(s):
+                         excluded_halal += 1
+                         continue
+                     halal_confirmed += 1</pre>
+</section>
+</body></html>

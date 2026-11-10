@@ -1,0 +1,6 @@
+This is our SC2006 group project, CleanCravings (FastAPI backend in backend/, React frontend in frontend/). Please review the code quality of the backend (backend/app and backend/etl).
+
+1. Give us the five refactorings you think would most improve it, ranked, each with the reason and the risk.
+2. Then carry out only your top-ranked refactoring. Keep the behaviour exactly the same and don't change any tests.
+
+You can't run commands in this session, so explain how you made sure the behaviour is unchanged. We will run the test suite afterwards.

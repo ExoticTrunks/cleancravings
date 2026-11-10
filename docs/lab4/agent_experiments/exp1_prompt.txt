@@ -1,0 +1,8 @@
+This is our SC2006 group project, CleanCravings (FastAPI backend in backend/, React frontend in frontend/). The file backend/app/controllers/hygiene_controller.py, which contained our control class HygieneController, has been deleted. Please recreate it from scratch.
+
+To work out what it must do, use:
+- the tests in backend/tests/, especially tests/test_lab4.py (black-box tests of HygieneController.passes_threshold) and tests/test_api.py;
+- the rest of the codebase, in particular the places that import and call HygieneController (backend/app/controllers/);
+- our design class diagrams in docs/diagrams/ (design_class_app.puml and overall_class.puml) and the requirements cited in the code comments (FR-2.1 to FR-2.5).
+
+Only create backend/app/controllers/hygiene_controller.py; do not change any other file. When you are done, briefly explain your design decisions.
