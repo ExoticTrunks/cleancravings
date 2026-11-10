@@ -15,8 +15,8 @@ from ..models import Favourite, FavouriteTarget, HawkerCentre, Licensee, SafeGra
 from ..schemas import CentreStatus, RecommendationItem, RecommendationOut, StallSummary
 from .cache import cached
 from .closure_controller import ClosureController
-from .hygiene_controller import GRADE_RANK
-from .presenters import stall_summary, wants_halal
+from .hygiene_controller import HygieneController
+from .presenters import confirmed_halal, stall_summary, wants_halal
 
 DISCLAIMER = (
     "Suggestions are ordered using official SFA, NEA and HPB data plus your preferences. "
@@ -104,12 +104,11 @@ class RecommendationController:
                 continue
             for s in c.stalls:
                 grade = s.safe_grade.grade_value if s.safe_grade else None
-                # Same rule as HygieneController.passes_threshold: no current grade fails any minimum
-                if threshold and (grade is None or GRADE_RANK[grade] < GRADE_RANK[threshold]):
+                if not HygieneController.grade_passes(grade, threshold):
                     excluded_hygiene += 1
                     continue
                 if halal_only:
-                    if s.halal is not True:  # as presenters.confirmed_halal: None means unknown
+                    if not confirmed_halal(s):
                         excluded_halal += 1
                         continue
                     halal_confirmed += 1

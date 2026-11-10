@@ -20,14 +20,26 @@ class HygieneController:
             return None  # latest SFA export had no SAFE grade for this licence
         return latest
 
+    @staticmethod
+    def grade_passes(grade: SafeGradeValue | None, threshold: SafeGradeValue | None) -> bool:
+        """The Hygiene Threshold rule (FR-2.5) on a grade value. Every list that filters by a
+        minimum grade (centre list, centre page, recommendations) goes through this."""
+        if threshold is None:
+            return True
+        if grade is None:
+            return False  # can't show an ungraded stall to someone who set a minimum
+        return GRADE_RANK[grade] >= GRADE_RANK[threshold]
+
     @classmethod
     def passes_threshold(cls, stall: Stall, threshold: SafeGradeValue | None) -> bool:
         if threshold is None:
             return True
         g = cls.current_grade(stall.licensee)
-        if g is None:
-            return False  # can't show an ungraded stall to someone who set a minimum
-        return GRADE_RANK[g.grade_value] >= GRADE_RANK[threshold]
+        return cls.grade_passes(g.grade_value if g else None, threshold)
+
+    @staticmethod
+    def suspended_past_year(licensee: Licensee | None) -> bool:
+        return bool(licensee and licensee.licence_status == "suspended")
 
     @classmethod
     def summary(cls, stalls: Iterable[Stall]) -> GradeSummary:
@@ -49,7 +61,7 @@ class HygieneController:
             if not changes or changes[-1].grade_value != g.grade_value:
                 changes.append(g)
         return TrackRecordOut(
-            suspended_past_year=bool(stall.licensee and stall.licensee.licence_status == "suspended"),
+            suspended_past_year=cls.suspended_past_year(stall.licensee),
             grade_history=[SafeGradeOut.model_validate(g) for g in reversed(changes)],
             last_updated=stall.licensee.last_seen_snapshot if stall.licensee else None,
         )

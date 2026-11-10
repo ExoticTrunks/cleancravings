@@ -19,7 +19,7 @@ def stall_summary(stall: Stall) -> StallSummary:
         cuisine=stall.cuisine,
         price_range=stall.price_range,
         safe_grade=SafeGradeOut.model_validate(g) if g else None,
-        suspended_past_year=bool(stall.licensee and stall.licensee.licence_status == "suspended"),
+        suspended_past_year=HygieneController.suspended_past_year(stall.licensee),
         hdp_participant=stall.hdp is not None,
         hdp_category=stall.hdp.participation_category if stall.hdp else None,
         hdp_match_method=stall.hdp.match_method if stall.hdp else None,
@@ -31,7 +31,7 @@ def wants_halal(profile: UserProfile | None) -> bool:
     return bool(profile and "HALAL" in (profile.dietary_restrictions or []))
 
 
-def confirmed_halal(stall: Stall) -> bool:
+def confirmed_halal(stall: Stall | StallSummary) -> bool:
     # Only an explicit True counts. None means the stall hasn't published it, not that it's non-halal
     return stall.halal is True
 

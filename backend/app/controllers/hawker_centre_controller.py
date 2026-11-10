@@ -71,19 +71,19 @@ class HawkerCentreController:
         return _photos[centre_id]
 
     @classmethod
-    def _cached_summaries(cls, db: Session, today: date) -> list[tuple[CentreSummary, int, str]]:
-        """Centre summaries without distance, plus the best current grade rank among each
+    def _cached_summaries(cls, db: Session, today: date) -> list[tuple[CentreSummary, SafeGradeValue | None, str]]:
+        """Centre summaries without distance, plus the best current grade among each
         centre's Cooked Food stalls and the text that search matches against. Cached (see
         controllers/cache.py), so each request only works out distance (NFR-1)."""
 
-        def build() -> list[tuple[CentreSummary, int, str]]:
+        def build() -> list[tuple[CentreSummary, SafeGradeValue | None, str]]:
             counts = cls.hdp_counts(db)
             rows = []
             for c in db.scalars(_centre_query()).all():
                 grades = (HygieneController.current_grade(s.licensee) for s in _cooked(c.stalls))
-                best_rank = max((GRADE_RANK[g.grade_value] for g in grades if g is not None), default=0)
+                best = max((g.grade_value for g in grades if g is not None), key=GRADE_RANK.__getitem__, default=None)
                 haystack = f"{c.centre_name} {c.street_address or ''} {c.postal_code or ''}".lower()
-                rows.append((centre_summary(c, today, None, counts.get(c.id, 0)), best_rank, haystack))
+                rows.append((centre_summary(c, today, None, counts.get(c.id, 0)), best, haystack))
             return rows
 
         return cached("centre_summaries", db, today, build)
@@ -101,13 +101,14 @@ class HawkerCentreController:
     ) -> list[CentreSummary]:
         out: list[CentreSummary] = []
         needle = (q or "").strip().lower()
-        for base, best_rank, haystack in cls._cached_summaries(db, today):
+        for base, best_grade, haystack in cls._cached_summaries(db, today):
             if region and base.region != region:
                 continue
             if needle and needle not in haystack:
                 continue
-            # Same result as passes_threshold() on each Cooked Food stall (FR-2.5)
-            if min_grade and best_rank < GRADE_RANK[min_grade]:
+            # A centre is listed if at least one Cooked Food stall meets the minimum (FR-2.5),
+            # i.e. if its best one does
+            if not HygieneController.grade_passes(best_grade, min_grade):
                 continue
             dist = round(haversine_km(origin[0], origin[1], base.latitude, base.longitude), 2) if origin else None
             if radius_km and dist is not None and dist > radius_km:

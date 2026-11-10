@@ -99,8 +99,9 @@ def build(rows: list[dict]) -> str:
 <p><b>HygieneController</b> (<code>backend/app/controllers/hygiene_controller.py</code>) holds the food-hygiene logic
 (FR-2.1 to FR-2.5). It works out a stall's current SAFE grade from the dated snapshots imported from SFA, builds its
 track record, and decides whether a stall meets a user's <i>Hygiene Threshold</i>: the minimum SAFE grade the user
-wants to see. That decision, <code>passes_threshold(stall, threshold)</code>, is used by the centre list filter, the
-centre page's stall list and the recommendations (FR-2.5, FR-5.4), so it decides which stalls a user is shown.</p>
+wants to see. <code>passes_threshold(stall, threshold)</code> makes that decision for a stall using the rule in
+<code>grade_passes()</code>, and the centre list filter, the centre page's stall list and the recommendations all use that one
+rule (FR-2.5, FR-5.4), so it decides which stalls a user is shown.</p>
 <p>The rules it implements:</p>
 <ul>
 <li>Grades are ordered <b>A &gt; B &gt; NEW &gt; C</b>. NEW (a stall licensed less than a year) ranks above C,
