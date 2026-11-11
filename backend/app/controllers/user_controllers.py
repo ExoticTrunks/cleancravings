@@ -53,13 +53,13 @@ class UserProfileController:
 class FavouriteController:
     @staticmethod
     def _describe(db: Session, f: Favourite, today: date) -> FavouriteOut:
-        label, subtitle, unavailable, state = "Unavailable", None, True, None
+        label, subtitle, unavailable, status = "Unavailable", None, True, None
         if f.target_type == FavouriteTarget.CENTRE and (c := db.get(HawkerCentre, f.target_id)):
             label, subtitle, unavailable = c.centre_name, c.region, False
-            state = ClosureController.centre_status(c, today).state
+            status = ClosureController.centre_status(c, today)
         elif f.target_type == FavouriteTarget.STALL and (s := db.get(Stall, f.target_id)):
             label, subtitle, unavailable = s.stall_name, s.centre.centre_name, False
-            state = ClosureController.centre_status(s.centre, today).state
+            status = ClosureController.centre_status(s.centre, today)
         elif f.target_type == FavouriteTarget.DISH and (d := db.get(DishType, f.target_id)):
             label, subtitle, unavailable = d.dish_name, d.category, False
         return FavouriteOut(
@@ -70,7 +70,7 @@ class FavouriteController:
             label=label,
             subtitle=subtitle,
             unavailable=unavailable,  # UC-7.0 EX.2, e.g. centre dropped from NEA list
-            centre_state=state,
+            centre_status=status,
         )
 
     @classmethod

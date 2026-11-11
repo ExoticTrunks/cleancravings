@@ -1823,22 +1823,15 @@
       "title": "Unavailable",
       "default": false
      },
-     "centre_state": {
+     "centre_status": {
       "anyOf": [
        {
-        "type": "string",
-        "enum": [
-         "open",
-         "closing_soon",
-         "closed",
-         "not_operating"
-        ]
+        "$ref": "#/components/schemas/CentreStatus"
        },
        {
         "type": "null"
        }
-      ],
-      "title": "Centre State"
+      ]
      }
     },
     "type": "object",

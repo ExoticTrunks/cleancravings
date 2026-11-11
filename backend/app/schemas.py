@@ -246,7 +246,7 @@ class FavouriteOut(BaseModel):
     label: str
     subtitle: str | None
     unavailable: bool = False
-    centre_state: CentreState | None = None
+    centre_status: CentreStatus | None = None
 
 
 class VisitIn(BaseModel):

@@ -202,7 +202,7 @@ export function Saved() {
                     <p className="truncate font-medium">{f.label}</p>
                     <p className="text-sm text-stone-500">{f.unavailable ? 'Unavailable: no longer in the official list' : f.subtitle}</p>
                   </Link>
-                  {f.centre_state && <StatusPill status={{ state: f.centre_state }} />}
+                  {f.centre_status && <StatusPill status={f.centre_status} />}
                   <button className="rounded-full p-2 text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800" onClick={() => remove(f.id)} aria-label={`Remove ${f.label}`}>
                     ✕
                   </button>

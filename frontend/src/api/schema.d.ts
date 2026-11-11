@@ -566,8 +566,7 @@ export interface components {
              * @default false
              */
             unavailable: boolean;
-            /** Centre State */
-            centre_state?: ("open" | "closing_soon" | "closed" | "not_operating") | null;
+            centre_status?: components["schemas"]["CentreStatus"] | null;
         };
         /**
          * FavouriteTarget

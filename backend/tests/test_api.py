@@ -79,6 +79,19 @@ def test_favourite_creates_closure_alert(client):
     assert len(client.get("/api/me/alerts", headers=AUTH).json()) == len(alerts)
 
 
+def test_saved_centres_carry_full_status(client):
+    """The Saved page's status pill needs the day count and reopening date, not only the state (FR-5.7)."""
+    other = {"Authorization": "Bearer dev:saved-status@example.com"}
+    centres = client.get("/api/centres").json()
+    for state, field in (("closing_soon", "days_to_next"), ("closed", "reopens_on")):
+        c = next(x for x in centres if x["status"]["state"] == state)
+        assert client.post("/api/me/favourites", json={"target_type": "CENTRE", "target_id": c["id"]}, headers=other).status_code == 201
+        saved = next(f for f in client.get("/api/me/favourites", headers=other).json() if f["target_id"] == c["id"])
+        assert saved["centre_status"]["state"] == state
+        assert saved["centre_status"][field] is not None
+        assert saved["centre_status"][field] == c["status"][field]
+
+
 def test_visit_log(client):
     sid = client.get("/api/centres/2").json()["stalls"][0]["id"]
     v = client.post("/api/me/visits", json={"stall_id": sid, "rating": 5, "note": "shiok"}, headers=AUTH)
