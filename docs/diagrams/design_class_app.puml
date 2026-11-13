@@ -71,6 +71,7 @@ package "Boundary (frontend/src/pages)" #EDEBFB {
     types generated from OpenAPI
     --
     + request(method, path, query, body)
+    + centrePhotoUrl(id): String
   }
 }
 
@@ -79,13 +80,16 @@ package "API: backend/app/routers + auth" #FDEBD0 {
     /api/... (no login, FR-0.1)
     --
     GET /centres, /centres/{id}
-    GET /stalls/{id}, /search
-    GET /dishes, /rules, /recommendations
+    GET /centres/{id}/photo  {NEA photo, proxied}
+    GET /stalls/{id}, /search, /regions
+    GET /dishes, /rules, /hdp-note
+    GET /recommendations
     GET /meta/freshness, /geocode
   }
   class MeRouter <<boundary>> {
     /api/me/... (login required, FR-0.2)
     --
+    GET /me
     GET, PUT /profile
     GET, POST, DELETE /favourites
     GET, POST /visits
@@ -104,6 +108,7 @@ package "Control (backend/app/controllers)" #D5F5E3 {
     + centre_detail(db, centre_id, today, min_grade, halal_only): CentreDetail
     + search(db, q, today): SearchOut
     + hdp_counts(db): Map<int, int>
+    + photo(db, centre_id): (bytes, content_type)
   }
   class StallController <<control>> {
     + stall_detail(db, stall_id, today): StallDetail
@@ -111,7 +116,9 @@ package "Control (backend/app/controllers)" #D5F5E3 {
   class HygieneController <<control>> {
     + GRADE_RANK: A > B > NEW > C
     + current_grade(licensee): SAFEGrade [0..1]
+    + grade_passes(grade, threshold): Boolean
     + passes_threshold(stall, threshold): Boolean
+    + suspended_past_year(licensee): Boolean
     + summary(stalls): GradeSummary
     + track_record(stall): TrackRecordOut
   }
@@ -126,6 +133,9 @@ package "Control (backend/app/controllers)" #D5F5E3 {
   }
   class RecommendationController <<control>> {
     + recommend(db, today, user, origin, limit): RecommendationOut
+    --
+    ordered list with plain-language reasons;
+    the score is never sent to the client (NFR-6)
   }
   class UserProfileController <<control>> {
     + get(db, user): ProfileOut [0..1]
@@ -150,6 +160,12 @@ package "Control (backend/app/controllers)" #D5F5E3 {
     + wants_halal(profile): Boolean
     + confirmed_halal(stall): Boolean
   }
+  class DataCache <<control>> {
+    backend/app/controllers/cache.py
+    --
+    + data_version(db, today): (today, last ok SyncRun id)
+    + cached(name, db, today, build): T
+  }
   class RuleEngine <<control>> {
     backend/app/rules/engine.py
     --
@@ -171,7 +187,9 @@ package "Entity (details in the entity class diagram)" #D6EAF8 {
   class Favourite <<entity>>
   class Visit <<entity>>
   class ClosureAlert <<entity>>
+  class SyncRun <<entity>>
 }
+DataCache ..> SyncRun
 
 HomePage ..> ApiClient
 FinderPage ..> ApiClient
@@ -199,6 +217,8 @@ MeRouter ..> AlertController
 
 HawkerCentreController ..> HygieneController
 HawkerCentreController ..> Presenters
+HawkerCentreController ..> DataCache
+RecommendationController ..> DataCache
 StallController ..> HygieneController
 RecommendationController ..> HygieneController
 RecommendationController ..> ClosureController
@@ -220,15 +240,11 @@ HealthierEatingController ..> DishType
 HealthierEatingController ..> ClassificationRule
 RecommendationController ..> UserProfile
 RecommendationController ..> Visit
+RecommendationController ..> Favourite
 UserProfileController ..> UserProfile
 FavouriteController ..> Favourite
 VisitController ..> Visit
 AlertController ..> ClosureAlert
 AuthenticationController ..> User
 
-note right of RecommendationController
-  Returns an ordered list with plain-language
-  reasons; the score itself is never sent to
-  the client (NFR-6).
-end note
 @enduml

@@ -53,6 +53,7 @@ class HawkerCentre #7FD0F5 {
   +region: String
   +latitude / longitude: float
   +number_of_stalls: int
+  +photo_url: String [0..1]
 }
 class Stall #7FD0F5 {
   +stall_name: String
@@ -123,6 +124,8 @@ class HawkerCentreController #F5A35C {
   +list_centres(q, region, min_grade, origin, radius_km)
   +centre_detail(centre_id, min_grade, halal_only)
   +search(q)
+  +hdp_counts(): Map<int, int>
+  +photo(centre_id): (bytes, content_type)
 }
 class StallController #E68FB4 {
   +stall_detail(stall_id)
@@ -130,7 +133,10 @@ class StallController #E68FB4 {
 class HygieneController #E68FB4 {
   +GRADE_RANK: A > B > NEW > C
   +current_grade(licensee)
+  +grade_passes(grade, threshold): Boolean
   +passes_threshold(stall, threshold): Boolean
+  +suspended_past_year(licensee): Boolean
+  +summary(stalls): GradeSummary
   +track_record(stall)
 }
 class ClosureController #66CDBF {
@@ -151,7 +157,14 @@ class Presenters <<Adapter>> #E5E7E9 {
   --
   +stall_summary(stall)
   +centre_summary(centre, origin, hdp_count)
+  +wants_halal(profile): Boolean
   +confirmed_halal(stall): Boolean
+}
+class DataCache <<Cache-Aside>> #E5E7E9 {
+  controllers/cache.py
+  --
+  +data_version(today): (today, last ok SyncRun)
+  +cached(name, today, build)
 }
 class RuleEngine #C8F08F {
   +evaluate(nutrients, rules, conditions): Assessment
@@ -224,6 +237,7 @@ class ApiClient <<Facade>> #FFFFFF {
   frontend/src/lib/api.ts
   --
   +centres() / centre() / stall() / search()
+  +centrePhotoUrl(id) / geocode(q)
   +dishes() / recommendations()
   +profile() / saveProfile() / favourites()
   +visits() / alerts() / readAlert()
@@ -258,6 +272,7 @@ class App #7FD0F5 {
   --
   +lifespan(): init_db()
   +include_router(public, me)
+  +_warm_centre_cache()  {Postgres only}
 }
 class Database <<Factory>> #7FD0F5 {
   backend/app/db.py
@@ -309,8 +324,14 @@ HealthierEatingController .[#7CB342].> RuleEngine
 AlertController .[#16A085].> ClosureController
 HawkerCentreController .[#E67E22].> Presenters
 RecommendationController .[#5B5BD6].> Presenters
+HawkerCentreController .[#E67E22].> DataCache : centre list
+RecommendationController .[#5B5BD6].> DataCache : candidate stalls
+FavouriteController .[#B7950B].> ClosureController : status + alerts on save
+Presenters ..> HygieneController
+Presenters ..> ClosureController
 Presenters .up.> Stall
 Presenters .up.> HawkerCentre
+DataCache .up.> SyncRun : keyed on latest ok run
 
 ' ---------------- Control -> Entity ----------------
 AuthenticationController .[#C0392B]up.> User
@@ -325,6 +346,8 @@ AlertController .[#16A085]up.> ClosureAlert
 HealthierEatingController .[#7CB342]up.> DishType
 HealthierEatingController .[#7CB342]up.> ClassificationRule
 RecommendationController .[#5B5BD6]up.> UserProfile
+RecommendationController .[#5B5BD6]up.> Visit : rating boost
+RecommendationController .[#5B5BD6]up.> Favourite : bookmark boost
 UserProfileController .[#2471A3]up.> UserProfile
 VisitController .[#2471A3]up.> Visit
 FavouriteController .[#B7950B]up.> Favourite
@@ -378,6 +401,7 @@ legend right
   | Adapter | Presenters | turns entities into API response shapes |
   | Observer | ContextProviders | pages update when sign-in, settings or location change |
   | Template Method | SyncRunLogger.sync_run() | same logging and rollback around every data source |
+  | Cache-Aside | DataCache.cached() | builds centre data once per data version, reused until the next sync |
   | Dependency Injection | AuthenticationController | FastAPI Depends() injects the user and db session |
 endlegend
 @enduml

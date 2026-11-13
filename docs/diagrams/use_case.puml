@@ -1,86 +1,99 @@
 @startuml CleanCravings_UseCaseDiagram
-' SC2006 SCSL Group 4. Use case model, kept in sync with docs/use_cases and the prototype.
+' SC2006 SCSL Group 4. Use case model v2.0 (Lab 5), synchronised with the prototype.
+' Grey use cases are planned and not built yet. The SRS (docs/lab5) has the descriptions.
 ' smetana = PlantUML's built-in layout engine, so this renders without Graphviz installed
 !pragma layout smetana
-title CleanCravings - Use Case Diagram
-' Top-to-bottom on purpose: smetana clips the top of the image in left-to-right mode
+title CleanCravings - Use Case Diagram (v2.0, Lab 5)
 skinparam shadowing false
 skinparam packageStyle rectangle
+skinparam actorStyle awesome
+left to right direction
 skinparam usecase {
   BackgroundColor #FBF7F0
   BorderColor #7A2E1F
+  BackgroundColor<<planned>> #EEEEEE
+  BorderColor<<planned>> #9E9E9E
+  FontColor<<planned>> #616161
 }
 
-actor "User / Diner" as User
-actor "Google Sign-In\n(via Supabase Auth)" as Google <<External Service>>
-actor "OneMap API" as OneMap <<External Service>>
-actor "SFA Track Records" as SFA <<External Service>>
-actor "NEA Hawker Centre\nClosure Dates\n(data.gov.sg)" as NEA <<External Service>>
-actor "HPB Healthier Dining\nPartners (data.gov.sg)" as HPB <<External Service>>
+actor "Guest" as Guest
+actor "Signed-in Diner" as Diner
+actor "Scheduler\n(GitHub Actions, daily)" as Scheduler
+actor "Google Sign-In\n(Supabase Auth)" as Google <<External Service>>
+actor "OneMap (SLA)" as OneMap <<External Service>>
+actor "NEA via data.gov.sg\n(centres, closures)" as NEA <<External Service>>
+actor "SFA Track Records\n(Excel export)" as SFA <<External Service>>
+actor "HPB via data.gov.sg\n(Healthier Dining)" as HPB <<External Service>>
+
+Diner -|> Guest
 
 rectangle "CleanCravings System" {
-  usecase "UC-0.1: Log In with Google" as UC01
-  usecase "UC-1.0: Manage Health Profile" as UC10
-  usecase "UC-2.0: Search & Filter\nHawker Centres" as UC20
-  usecase "UC-2.1: Get Directions to\nHawker Centre" as UC21
-  usecase "UC-3.0: View Stall Hygiene\nGrades & Track Records" as UC30
-  usecase "UC-4.0: Track Meal History" as UC40
-  usecase "UC-4.1: View Weekly\nHealth Digest" as UC41
-  usecase "UC-4.2: Export Health\nSummary Report" as UC42
-  usecase "UC-5.0: Update\nRecommendation Engine" as UC50
-  usecase "UC-6.0: Dish Recommendation" as UC60
-  usecase "UC-7.0: Bookmark Hawker\nCentre or Dish" as UC70
-  usecase "UC-8.0: Closure Alert for\nBookmarked Centres" as UC80
-  usecase "UC-9.0: Submit Stall-to-Dish\nReport" as UC90
-  usecase "UC-10.0: Manage Accessibility" as UC100
-  usecase "UC-11.0: Rate and Comment\non Hawker Stall" as UC110
+  package "Anyone (guest or signed in)" {
+    usecase "UC-0.1: Log In with Google\nand Log Out" as UC01
+    usecase "UC-2.0: Search & Filter\nHawker Centres" as UC20
+    usecase "UC-3.0: View Stall Hygiene\nGrades & Track Records" as UC30
+    usecase "UC-5.0: Recommend Clean,\nNearby Stalls" as UC50
+    usecase "UC-6.0: Dish Recommendation" as UC60
+    usecase "UC-10.0: Manage Accessibility" as UC100
+    usecase "UC-2.1: Get Directions to\nHawker Centre" as UC21 <<planned>>
+  }
+  package "Signed in" {
+    usecase "UC-1.0: Manage Health Profile" as UC10
+    usecase "UC-4.0: Track Meal History\n(Visit Log)" as UC40
+    usecase "UC-7.0: Bookmark Centre,\nStall or Dish" as UC70
+    usecase "UC-8.0: Closure Alerts for\nBookmarked Centres" as UC80
+    usecase "UC-4.1: View Weekly\nHealth Digest" as UC41 <<planned>>
+    usecase "UC-4.2: Export Health\nSummary Report" as UC42 <<planned>>
+    usecase "UC-9.0: Submit Stall-to-Dish\nReport" as UC90 <<planned>>
+    usecase "UC-11.0: Rate and Comment\non Hawker Stall" as UC110 <<planned>>
+  }
+  package "Background" {
+    usecase "UC-12.0: Refresh Official Data" as UC120
+  }
 }
 
-User --> UC01
-User --> UC10
-User --> UC20
-User --> UC21
-User --> UC30
-User --> UC40
-User --> UC41
-User --> UC42
-User --> UC60
-User --> UC70
-User --> UC80
-User --> UC90
-User --> UC100
-User --> UC110
+Guest --> UC01
+Guest --> UC20
+Guest --> UC30
+Guest --> UC50
+Guest --> UC60
+Guest --> UC100
+Guest --> UC21
 
-' Directed so the layout ranks every external service to the right of the use cases
+Diner --> UC10
+Diner --> UC40
+Diner --> UC70
+Diner --> UC80
+Diner --> UC41
+Diner --> UC42
+Diner --> UC90
+Diner --> UC110
+
+Scheduler --> UC120
+
 UC01 --> Google
 UC20 --> OneMap
 UC21 --> OneMap
-UC30 --> SFA
-UC30 --> HPB
-UC80 --> NEA
+UC120 --> NEA
+UC120 --> SFA
+UC120 --> HPB
 
 UC20 ..> UC30 : <<include>>
 UC21 ..> UC20 : <<extend>>
-UC40 ..> UC50 : <<include>>
+UC80 ..> UC70 : <<extend>>
+UC120 ..> UC80 : <<include>>
 UC41 ..> UC40 : <<extend>>
 UC42 ..> UC40 : <<extend>>
 UC41 ..> UC60 : <<include>>
-UC60 ..> UC10 : <<include>>
-UC80 ..> UC70 : <<extend>>
-UC80 ..> UC50 : <<include>>
-
-note bottom of UC01
-  Google is the only sign-in method.
-  Guests can browse centres, stalls
-  and dishes without logging in (FR-0.1).
-end note
 
 legend right
-  Prototype v0.2 scope
-  Built: UC-0.1, 1.0, 2.0, 3.0, 4.0 (visit log),
-  5.0, 6.0, 7.0, 8.0 (in-app alerts),
-  10.0 (dark mode, text size)
-  Not built yet: UC-2.1 routing ("Open in Maps" only),
-  4.1, 4.2, 9.0, 11.0, voice search (UC-10.0)
+  v2.0 (Lab 5) changes from v1.0.1
+  * Actor split into Guest and Signed-in Diner
+    (a Signed-in Diner can do everything a Guest can)
+  * UC-5.0 is now the "For you" stall picks
+  * UC-7.0 also bookmarks stalls
+  * New UC-12.0: daily sync of NEA, SFA and HPB data,
+    outside the request path (NFR-9, NFR-10)
+  * Grey = planned, not built in this prototype
 endlegend
 @enduml
